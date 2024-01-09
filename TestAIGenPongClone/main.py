@@ -9,6 +9,7 @@ pygame.init()
 WIDTH, HEIGHT = 600, 400
 PADDLE_WIDTH, PADDLE_HEIGHT = 15, 60
 BALL_SIZE = 15
+LINE_WIDTH = 2
 FPS = 60
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -69,6 +70,11 @@ while True:
     pygame.draw.rect(screen, WHITE, paddle1)
     pygame.draw.rect(screen, WHITE, paddle2)
     pygame.draw.ellipse(screen, WHITE, ball)
+
+    # Draw dashed line down the middle
+    for y in range(0, HEIGHT, 20):
+        pygame.draw.rect(screen, WHITE, (WIDTH // 2 - LINE_WIDTH // 2, y, LINE_WIDTH, 10))
+
 
     # Update the display
     pygame.display.flip()
