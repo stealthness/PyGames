@@ -77,7 +77,11 @@ while True:
         score2 += 1
         ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
         if score2 == winning_score:
-            print("Player 2 wins!")
+            win_message = font.render("Player 2 wins! Press R to replay.", True, WHITE)
+            screen.blit(win_message,
+                        (WIDTH // 2 - win_message.get_width() // 2, HEIGHT // 2 - win_message.get_height() // 2))
+            pygame.display.flip()
+            pygame.time.wait(2000)  # Pause for 2 seconds
             score1 = 0
             score2 = 0
             ball_speed = [0, 0]
@@ -87,7 +91,11 @@ while True:
         score1 += 1
         ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
         if score1 == winning_score:
-            print("Player 1 wins!")
+            win_message = font.render("Player 1 wins! Press R to replay.", True, WHITE)
+            screen.blit(win_message,
+                        (WIDTH // 2 - win_message.get_width() // 2, HEIGHT // 2 - win_message.get_height() // 2))
+            pygame.display.flip()
+            pygame.time.wait(2000)  # Pause for 2 seconds
             score1 = 0
             score2 = 0
             ball_speed = [0, 0]
