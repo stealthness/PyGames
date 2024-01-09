@@ -23,13 +23,20 @@ clock = pygame.time.Clock()
 
 # Paddle 1
 paddle1 = pygame.Rect(50, HEIGHT // 2 - PADDLE_HEIGHT // 2, PADDLE_WIDTH, PADDLE_HEIGHT)
+paddle1_speed = 5
 
 # Paddle 2
 paddle2 = pygame.Rect(WIDTH - 50 - PADDLE_WIDTH, HEIGHT // 2 - PADDLE_HEIGHT // 2, PADDLE_WIDTH, PADDLE_HEIGHT)
+paddle2_speed = 5
 
 # Ball
 ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
 ball_speed = [4 * random.choice((1, -1)), 4 * random.choice((1, -1))]
+
+# Score
+score1 = 0
+score2 = 0
+font = pygame.font.Font(None, 36)
 
 # Main game loop
 while True:
@@ -40,13 +47,13 @@ while True:
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_w] and paddle1.top > 0:
-        paddle1.y -= 5
+        paddle1.y -= paddle1_speed
     if keys[pygame.K_s] and paddle1.bottom < HEIGHT:
-        paddle1.y += 5
+        paddle1.y += paddle1_speed
     if keys[pygame.K_UP] and paddle2.top > 0:
-        paddle2.y -= 5
+        paddle2.y -= paddle2_speed
     if keys[pygame.K_DOWN] and paddle2.bottom < HEIGHT:
-        paddle2.y += 5
+        paddle2.y += paddle2_speed
 
     # Move the ball
     ball.x += ball_speed[0]
@@ -57,24 +64,35 @@ while True:
         ball_speed[1] = -ball_speed[1]
 
     # Ball collisions with paddles
-    if ball.colliderect(paddle1) or ball.colliderect(paddle2):
+    if ball.colliderect(paddle1):
+        ball_speed[0] = -ball_speed[0]
+    elif ball.colliderect(paddle2):
         ball_speed[0] = -ball_speed[0]
 
     # Check if the ball goes out of bounds
-    if ball.left <= 0 or ball.right >= WIDTH:
+    if ball.left <= 0:
+        score2 += 1
+        ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
+        ball_speed = [4 * random.choice((1, -1)), 4 * random.choice((1, -1))]
+    elif ball.right >= WIDTH:
+        score1 += 1
         ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
         ball_speed = [4 * random.choice((1, -1)), 4 * random.choice((1, -1))]
 
     # Draw everything
     screen.fill(BLACK)
-    pygame.draw.rect(screen, WHITE, paddle1)
-    pygame.draw.rect(screen, WHITE, paddle2)
-    pygame.draw.ellipse(screen, WHITE, ball)
 
     # Draw dashed line down the middle
     for y in range(0, HEIGHT, 20):
         pygame.draw.rect(screen, WHITE, (WIDTH // 2 - LINE_WIDTH // 2, y, LINE_WIDTH, 10))
 
+    pygame.draw.rect(screen, WHITE, paddle1)
+    pygame.draw.rect(screen, WHITE, paddle2)
+    pygame.draw.ellipse(screen, WHITE, ball)
+
+    # Draw the score
+    score_display = font.render(f"{score1} - {score2}", True, WHITE)
+    screen.blit(score_display, (WIDTH // 2 - score_display.get_width() // 2, 10))
 
     # Update the display
     pygame.display.flip()
