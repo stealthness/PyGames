@@ -75,16 +75,24 @@ while True:
     # Check if the ball goes out of bounds
     if ball.left <= 0:
         score2 += 1
+        ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
         if score2 == winning_score:
             print("Player 2 wins!")
             score1 = 0
             score2 = 0
+            ball_speed = [0, 0]
+        else:
+            ball_speed = [4 * random.choice((1, -1)), 4 * random.choice((1, -1))]
     elif ball.right >= WIDTH:
         score1 += 1
+        ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
         if score1 == winning_score:
             print("Player 1 wins!")
             score1 = 0
             score2 = 0
+            ball_speed = [0, 0]
+        else:
+            ball_speed = [4 * random.choice((1, -1)), 4 * random.choice((1, -1))]
 
     # Draw everything
     screen.fill(BLACK)
