@@ -38,6 +38,9 @@ score1 = 0
 score2 = 0
 font = pygame.font.Font(None, 36)
 
+# Winning score
+winning_score = 5
+
 # Main game loop
 while True:
     for event in pygame.event.get():
@@ -72,12 +75,16 @@ while True:
     # Check if the ball goes out of bounds
     if ball.left <= 0:
         score2 += 1
-        ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
-        ball_speed = [4 * random.choice((1, -1)), 4 * random.choice((1, -1))]
+        if score2 == winning_score:
+            print("Player 2 wins!")
+            score1 = 0
+            score2 = 0
     elif ball.right >= WIDTH:
         score1 += 1
-        ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
-        ball_speed = [4 * random.choice((1, -1)), 4 * random.choice((1, -1))]
+        if score1 == winning_score:
+            print("Player 1 wins!")
+            score1 = 0
+            score2 = 0
 
     # Draw everything
     screen.fill(BLACK)
@@ -93,6 +100,13 @@ while True:
     # Draw the score
     score_display = font.render(f"{score1} - {score2}", True, WHITE)
     screen.blit(score_display, (WIDTH // 2 - score_display.get_width() // 2, 10))
+
+    # Check for replay
+    if keys[pygame.K_r]:
+        score1 = 0
+        score2 = 0
+        ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
+        ball_speed = [4 * random.choice((1, -1)), 4 * random.choice((1, -1))]
 
     # Update the display
     pygame.display.flip()
