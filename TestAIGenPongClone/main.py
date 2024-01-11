@@ -48,19 +48,18 @@ title_rect = title_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
 
 # Main splash screen loop
 splash_screen = True
+screen.fill(BLACK)
+screen.blit(title_text, title_rect)
+pygame.display.flip()
+pygame.time.wait(2000)
+
 while splash_screen:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_SPACE]:
-        splash_screen = False
-
-    screen.fill(BLACK)
-    screen.blit(title_text, title_rect)
-    pygame.display.flip()
+        if event.type == pygame.KEYDOWN:
+            splash_screen = False
     clock.tick(FPS)
 
 # Main game loop
