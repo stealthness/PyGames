@@ -41,6 +41,28 @@ font = pygame.font.Font(None, 36)
 # Winning score
 winning_score = 5
 
+# Title Splash Screen
+title_font = pygame.font.Font(None, 72)
+title_text = title_font.render("Pong", True, WHITE)
+title_rect = title_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+
+# Main splash screen loop
+splash_screen = True
+while splash_screen:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_SPACE]:
+        splash_screen = False
+
+    screen.fill(BLACK)
+    screen.blit(title_text, title_rect)
+    pygame.display.flip()
+    clock.tick(FPS)
+
 # Main game loop
 while True:
     for event in pygame.event.get():
