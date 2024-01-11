@@ -1,3 +1,5 @@
+import os
+
 import pygame
 import sys
 import random
@@ -36,15 +38,15 @@ ball_speed = [4 * random.choice((1, -1)), 4 * random.choice((1, -1))]
 # Score
 score1 = 0
 score2 = 0
-font = pygame.font.Font(None, 36)
+font = pygame.font.Font("ObelusCompact.ttf", 72)
 
 # Winning score
 winning_score = 5
 
 # Title Splash Screen
-title_font = pygame.font.Font(None, 72)
+title_font = pygame.font.Font("ObelusCompact.ttf", 250)
 title_text = title_font.render("Pong", True, WHITE)
-title_rect = title_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+title_rect = title_text.get_rect(center=(WIDTH // 2, HEIGHT * 1 // 3))
 
 # Main splash screen loop
 splash_screen = True
@@ -52,6 +54,10 @@ screen.fill(BLACK)
 screen.blit(title_text, title_rect)
 pygame.display.flip()
 pygame.time.wait(2000)
+
+
+
+
 
 while splash_screen:
     for event in pygame.event.get():
@@ -98,11 +104,12 @@ while True:
         score2 += 1
         ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
         if score2 == winning_score:
-            win_message = font.render("Player 2 wins! Press R to replay.", True, WHITE)
+            win_message = font.render("Player 2 wins!", True, WHITE)
             screen.blit(win_message,
                         (WIDTH // 2 - win_message.get_width() // 2, HEIGHT // 2 - win_message.get_height() // 2))
             pygame.display.flip()
             pygame.time.wait(2000)  # Pause for 2 seconds
+            win_message = font.render("Press R to Replay", True, WHITE)
             score1 = 0
             score2 = 0
             ball_speed = [0, 0]
@@ -112,11 +119,12 @@ while True:
         score1 += 1
         ball = pygame.Rect(WIDTH // 2 - BALL_SIZE // 2, HEIGHT // 2 - BALL_SIZE // 2, BALL_SIZE, BALL_SIZE)
         if score1 == winning_score:
-            win_message = font.render("Player 1 wins! Press R to replay.", True, WHITE)
+            win_message = font.render("Player 1 wins!", True, WHITE)
             screen.blit(win_message,
                         (WIDTH // 2 - win_message.get_width() // 2, HEIGHT // 2 - win_message.get_height() // 2))
             pygame.display.flip()
             pygame.time.wait(2000)  # Pause for 2 seconds
+            win_message = font.render("Press R to Replay", True, WHITE)
             score1 = 0
             score2 = 0
             ball_speed = [0, 0]
