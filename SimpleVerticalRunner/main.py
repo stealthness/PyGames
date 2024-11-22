@@ -1,5 +1,6 @@
 import pygame
 import sys
+from playerClass import Player
 # Intialise pygame
 pygame.init()
 
@@ -8,6 +9,7 @@ WINDOW_WIDTH = 300
 WINSOW_HEIGHT = 600
 
 PLAYER_WIDTH = 20
+player = Player(WINDOW_WIDTH // 2, WINSOW_HEIGHT - PLAYER_WIDTH)
 
 # Create the game window
 
@@ -19,16 +21,17 @@ clock = pygame.time.Clock()
 
 score = 0 
 lives = 3
-player = pygame.Rect(WINDOW_WIDTH // 2, WINSOW_HEIGHT - 30, PLAYER_WIDTH, PLAYER_WIDTH)
 playerSpeed = 5
 WHITE = (255,255,255)
 RED = (255, 0 , 0)
 BLACK = (0, 0, 0 )
-DARK_BLUE = (0, 155, 0)
+DARK_BLUE = (0, 0, 55)
 
 ## MAIN GAME Loop
 
 isRunning = True
+
+
 
 while isRunning:
     
@@ -40,21 +43,24 @@ while isRunning:
         
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
-            print("a pressed")
+            player.move(-5)
             
         if keys[pygame.K_d]:
-            print("b pressed")
+            player.move(5)
+            
         if keys[pygame.K_q]:
             isRunning = False
             
     # move the player
     screen.fill(DARK_BLUE)
-    pygame.draw.rect(screen, WHITE, player)
+    player.draw(screen)
     
     # Update the display
     pygame.display.flip()
             
     clock.tick(60)
+    
+
 sys.exit()
 
 
