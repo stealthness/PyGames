@@ -1,6 +1,8 @@
 import pygame
 import sys
-from playerClass import Player, Rock
+from playerClass import Player
+from objects import Rock
+from rockManager import RockManager
 
 # Initialise pygame
 pygame.init()
@@ -11,7 +13,9 @@ WINDOW_HEIGHT = 600
 
 PLAYER_WIDTH = 20
 player = Player()
-rock1 = Rock()
+rock1 = Rock(dy=5)
+rock1.dy = 5
+RockManager = RockManager()
 
 # Create the game window
 
@@ -37,20 +41,20 @@ isGameOver = False
 
 
 while isRunning:
-    
+
     for event in pygame.event.get():
         if event.type == pygame.quit:
             pygame.quit()
             isRunning = False
-            
-        
+
+
         keys = pygame.key.get_pressed()
         if not isGameOver and keys[pygame.K_a]:
             player.move(-5)
-            
+
         if not isGameOver and keys[pygame.K_d]:
             player.move(5)
-            
+
         if keys[pygame.K_q]:
             isRunning = False
 
@@ -62,10 +66,10 @@ while isRunning:
     # move the player
     screen.fill(DARK_BLUE)
     player.draw(screen)
-    rock1.move(5)
-    rock1.draw(screen)
     if not rock1.update():
         rock1 = Rock()
+    rock1.draw(screen)
+    RockManager.update()
     # Update the display
 
     # check for collision
