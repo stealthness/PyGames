@@ -1,22 +1,25 @@
 import pygame
 import sys
-from playerClass import Player
-# Intialise pygame
+from playerClass import Player, Rock
+
+# Initialise pygame
 pygame.init()
 
-# setting some costants
+# setting some constants
 WINDOW_WIDTH = 300 
-WINSOW_HEIGHT = 600
+WINDOW_HEIGHT = 600
 
 PLAYER_WIDTH = 20
-player = Player(WINDOW_WIDTH // 2, WINSOW_HEIGHT - PLAYER_WIDTH)
+player = Player()
+rock1 = Rock()
 
 # Create the game window
 
-screen = pygame.display.set_mode((WINDOW_WIDTH, WINSOW_HEIGHT))
+screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Simple Vertical Runner")
 
-# set the game clock fram rate
+# set the game clock frame rate
+FPS = 15
 clock = pygame.time.Clock()
 
 score = 0 
@@ -30,7 +33,7 @@ DARK_BLUE = (0, 0, 55)
 ## MAIN GAME Loop
 
 isRunning = True
-
+isGameOver = False
 
 
 while isRunning:
@@ -42,24 +45,42 @@ while isRunning:
             
         
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_a]:
+        if not isGameOver and keys[pygame.K_a]:
             player.move(-5)
             
-        if keys[pygame.K_d]:
+        if not isGameOver and keys[pygame.K_d]:
             player.move(5)
             
         if keys[pygame.K_q]:
             isRunning = False
-            
+
+    if isGameOver:
+        clock.tick(FPS)
+        continue
+
+
     # move the player
     screen.fill(DARK_BLUE)
     player.draw(screen)
-    
+    rock1.move(5)
+    rock1.draw(screen)
+    if not rock1.update():
+        rock1 = Rock()
     # Update the display
+
+    # check for collision
+    if player.check_collision(rock1):
+        lives -= 1
+        if lives == 0:
+            isGameOver = True
+            rock1.active = False
+        else:
+            rock1 = Rock()
+
     pygame.display.flip()
-            
-    clock.tick(60)
-    
+
+    clock.tick(FPS)
+
 
 sys.exit()
 
