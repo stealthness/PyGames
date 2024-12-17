@@ -26,7 +26,7 @@ class Scene:
 def init(scene):
 
     player = Solder(100, 100, 2)
-    enemy = Solder(200, 100, 2)
+    enemy = Solder(200, 100, 2, image='Art/misc/simplePlayer.png')
     scene.add_enemy(player)
     scene.add_enemy(enemy)
 
