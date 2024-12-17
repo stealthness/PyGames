@@ -55,7 +55,7 @@ def run():
                 if event.key == pygame.K_d:
                     dir.x = 0
 
-        screen.fill((255, 255, 255))
+        draw_background()
 
         scene.enemies[0].move(dir)
 
@@ -65,6 +65,11 @@ def run():
         pygame.display.flip()
         pygame.display.update()
         pygame.time.Clock().tick(60)
+
+
+def draw_background():
+    screen.fill((255, 255, 255))
+
 
 if __name__ == '__main__':
     run()
