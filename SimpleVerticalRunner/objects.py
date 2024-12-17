@@ -1,6 +1,3 @@
-import random
-import pygame
-
 class GameObject:
 
     def __init__(self, name, x = 0, y = 0, dx = 0, dy = 0):
@@ -10,7 +7,7 @@ class GameObject:
         self.dx = dx
         self.dy = dy
         self.active = True
-        self.debugMode = True
+        self.debugMode = False
         self.init_x = x
         self.init_y = y
         self.init_dx = dx
@@ -30,10 +27,11 @@ class GameObject:
 
     def move(self, dx, dy):
         if self.debugMode:
-            print(f'GO move: {self}, dx:{dx}, dy:{dy}')
+            print(f'GO(0) move: {self}, dx:{dx}, dy:{dy}')
         if self.active:
             self.x += dx
             self.y += dy
+        print(f'GO(1) move: {self}, dx:{dx}, dy:{dy}')
 
     def reset(self):
         self.x = self.init_x
@@ -41,29 +39,3 @@ class GameObject:
         self.dx = self.init_dx
         self.dy = self.init_dy
 
-class Rock(GameObject):
-
-    def __init__(self, x = 150, y = -50, dx = 0, dy = 3):
-        super().__init__('rock', x, y)
-        x = random.randint(0,300)
-        self.width = 20
-        self.color = (250, 250, 250)
-        self.rect = pygame.Rect(x, y, self.width, self.width)
-        self.speed = 10
-
-    def update(self) -> bool:
-        if self.rect.y > 600:
-            self.active = False
-            return False
-        super().update()
-        return True
-
-    def move(self, dx, dy):
-        super().move(0, self.dy)
-
-    def draw(self, screen):
-        if not self.active:
-            return False
-        else:
-            pygame.draw.rect(screen, self.color, self.rect)
-            return True

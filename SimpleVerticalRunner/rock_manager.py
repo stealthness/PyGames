@@ -1,6 +1,7 @@
 import pygame
 import random
-from objects import Rock
+from SimpleVerticalRunner.rock import Rock
+
 
 class RockManager:
 
@@ -13,17 +14,21 @@ class RockManager:
 
 
     def update(self):
-        if self.is_all_active():
-            return
+
         if random.randint(0,100) < 5:
             for rock in self.rocks:
                 if not rock.active:
-                    rock.reset()
-                    rock.active = True
+                    self.activate_rock(rock)
                     break
+
 
     def is_all_active(self) -> bool:
         for rock in self.rocks:
             if not rock.active:
                 return False
         return True
+
+    @staticmethod
+    def activate_rock(rock):
+        rock.reset()
+        rock.active = True
