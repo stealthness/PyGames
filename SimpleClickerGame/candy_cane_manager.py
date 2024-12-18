@@ -1,17 +1,16 @@
-import pygame
-
-
-class CandyCane:
-    def __init__(self):
-        self.pos = pygame.Vector2(0,0)
-        self.image = pygame.image.load('candy_cane.png')
-        self.rect = pygame.Rect(0,0)
+from SimpleClickerGame.candy_cane import CandyCane
 
 
 class CandyCaneManager:
     def __init__(self):
-        candy_cane = CandyCane()
         self.candy_list = []
+        for _ in range(4):
+            self.candy_list.append(CandyCane())
 
-    def update(self):
-        pass
+    def update(self, screen, point):
+        for candy in self.candy_list:
+            if point is not None and candy.rect.collidepoint(point):
+                pass
+            else:          
+                candy.update()
+                candy.draw(screen)

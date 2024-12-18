@@ -1,7 +1,6 @@
 import sys
 
 import pygame
-
 from SimpleClickerGame.candy_cane_manager import CandyCaneManager
 
 SCREEN_WIDTH = 800
@@ -15,16 +14,27 @@ screen = pygame.display.set_mode((500, 500))
 
 def run():
     
+    clock = pygame.time.Clock()
     candy_cane_manager = CandyCaneManager()
-    
+    pos = None
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return
-        candy_cane_manager.update()
-        screen.fill(BACKGROUND_COLOR)
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = event.pos
+
+        screen.fill(BACKGROUND_COLOR)    
+    
+        candy_cane_manager.update(screen, pos)
         pygame.display.flip()
-        pygame.display.update()
+        clock.tick(60)
+        pos = None
 
 
 if __name__ == "__main__":
