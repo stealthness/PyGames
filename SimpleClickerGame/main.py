@@ -6,9 +6,6 @@ from pygame import Vector2
 from SimpleClickerGame.candy_cane_manager import CandyCaneManager
 
 
-
-
-
 def run():
     SCREEN_WIDTH = 600
     SCREEN_HEIGHT = 800
@@ -19,6 +16,8 @@ def run():
     clock = pygame.time.Clock()
     candy_cane_manager = CandyCaneManager()
     pos = None
+
+    
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
