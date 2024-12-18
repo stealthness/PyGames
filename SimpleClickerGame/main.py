@@ -5,16 +5,16 @@ from pygame import Vector2
 
 from SimpleClickerGame.candy_cane_manager import CandyCaneManager
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-BACKGROUND_COLOR = (200, 200, 255)
 
-pygame.init()
-pygame.display.set_caption("Clicker Game")
-screen = pygame.display.set_mode((500, 500))
+
 
 
 def run():
+    SCREEN_WIDTH = 600
+    SCREEN_HEIGHT = 800
+    BACKGROUND_COLOR = (200, 200, 255)
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
+    pygame.display.set_caption("Clicker Game")
     font = pygame.font.Font(None, 36)
     clock = pygame.time.Clock()
     candy_cane_manager = CandyCaneManager()
@@ -24,6 +24,10 @@ def run():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == pygame.VIDEORESIZE:
+                SCREEN_WIDTH = event.w
+                SCREEN_HEIGHT = event.h
+                screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
@@ -40,6 +44,7 @@ def run():
 
 
 if __name__ == "__main__":
+    pygame.init()
     run()
     pygame.quit()
     sys.exit()

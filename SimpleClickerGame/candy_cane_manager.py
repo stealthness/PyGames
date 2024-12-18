@@ -4,6 +4,8 @@ from SimpleClickerGame.candy_cane import CandyCane
 
 WHITE = (255, 255, 255)
 
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 800
 
 class CandyCaneManager:
     def __init__(self):
@@ -13,14 +15,9 @@ class CandyCaneManager:
         self.score = 0
 
     def increase_score(self, score, screen):
-        score += 1
+        self.score += 1
 
-        font = pygame.font.Font(None, 36)
-        score_text = font.render(f"Score: {score}", True, WHITE)
-        text_rect = score_text.get_rect(center=( 300, 670))  # Centered at bottom
-        
-        # Blit the score text onto the screen
-        screen.blit(score_text, text_rect)
+
 
     def update(self, screen, point):
         for candy in self.candy_list:
@@ -35,3 +32,10 @@ class CandyCaneManager:
             else:
                 candy.update()
                 candy.draw(screen)
+                
+        font = pygame.font.Font(None, 36)
+        score_text = font.render(f"Score: {self.score}", True, WHITE)
+        text_rect = score_text.get_rect(center=( SCREEN_WIDTH // 2 - 10, SCREEN_HEIGHT - 100))  # Centered at bottom
+
+        # Blit the score text onto the screen
+        screen.blit(score_text, text_rect)
