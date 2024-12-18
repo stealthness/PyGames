@@ -18,19 +18,28 @@ class CandyCane:
 
     def update(self):
         if not self.active:
+            self.reset_pos()
             return
 
         self.pos.y += self.speed
         self.rect.y = self.pos.y
 
         if self.pos.y > 500:
-            self.pos = self.get_random_start_position()
+            self.reset_pos()
+            
+    def reset_pos(self):
+        self.pos = self.get_random_start_position()
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
+        self.active = True   
+            
 
     def draw(self, screen):
         if self.active:
             screen.blit(self.image, self.pos)
 
     def point_collided(self, point: Vector2):
+        print(f'point_collided: {point}, self.pos: {self.pos}, type: {type(self)}, self.rect: {type(self.rect)}')
         if self.rect.collidepoint(point.x, point.y):
             self.active = False
             return True
