@@ -1,8 +1,8 @@
 import pygame
 import sys
-from playerClass import Player
-from objects import Rock
-from rockManager import RockManager
+from player_class import Player
+from rock import Rock
+from rock_manager import RockManager
 
 # Initialise pygame
 pygame.init()
@@ -13,6 +13,8 @@ WINDOW_HEIGHT = 600
 
 PLAYER_WIDTH = 20
 player = Player()
+
+rocks = [Rock() for i in range(5)]
 rock1 = Rock(dy=5)
 rock1.dy = 5
 RockManager = RockManager()
@@ -66,9 +68,9 @@ while isRunning:
     # move the player
     screen.fill(DARK_BLUE)
     player.draw(screen)
-    if not rock1.update():
-        rock1 = Rock()
-    rock1.draw(screen)
+    for rock in rocks:
+        rock.update()
+        rock.draw(screen)
     RockManager.update()
     # Update the display
 
