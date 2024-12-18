@@ -23,7 +23,6 @@ class Solder(pygame.sprite.Sprite):
             self.image = pygame.transform.scale(self.image, (int(self.rect.width * self.scale), int(self.rect.height * self.scale)))
         if isinstance(self.image, pygame.surface.Surface):
             screen.blit(pygame.transform.flip(self.image, self.is_flip_x, False), self.rect)
-
         else:
             screen.blit(pygame.transform.flip(self.default_image, self.is_flip_x, False), self.rect)
 
