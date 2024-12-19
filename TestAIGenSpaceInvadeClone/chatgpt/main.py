@@ -36,18 +36,19 @@ enemy_x_change = []
 enemy_y_change = []
 enemy_active = []  # Track if enemies are active
 
-initial_speed = 1  # Start slower
-speed_increment = 0.2
+initial_speed = 0.3  # Start slower
+speed_increment = 0.1
 current_speed = initial_speed
 
 enemy_direction = 1  # Shared direction for all enemies
+enemy_drop_rate = 8  # Variable to adjust drop-down amount
 
 for row in range(rows):
     for col in range(cols):
         enemy_x.append(50 + col * 70)
         enemy_y.append(50 + row * 50)
         enemy_x_change.append(initial_speed * enemy_direction)
-        enemy_y_change.append(40)
+        enemy_y_change.append(enemy_drop_rate)
         enemy_active.append(True)
 
 bullet_x = 0
@@ -139,7 +140,7 @@ while running:
     if reverse_direction:
         enemy_direction *= -1
         for j in range(len(enemy_y)):
-            enemy_y[j] += 40
+            enemy_y[j] += enemy_drop_rate  # Use adjustable drop rate
 
     # Increase speed as enemies are killed
     if active_enemy_count < len(enemy_x):
