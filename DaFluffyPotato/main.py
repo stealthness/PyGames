@@ -11,6 +11,7 @@ class Game:
         pygame.display.set_caption('DaFluffyPotato Tutorial')
         self.clock = pygame.time.Clock()
         self.FPS = 60
+        self.img = pygame.image.load('data/Art/clouds/cloud_1.png')
 
     def run(self):
         while True:
@@ -23,6 +24,7 @@ class Game:
                         pygame.quit()
                         pygame.init()
             self.screen.fill(self.BACKGROUND_Color)
+            self.screen.blit(self.img, (100, 100))
             pygame.display.flip()
             self.clock.tick(self.FPS)
 
