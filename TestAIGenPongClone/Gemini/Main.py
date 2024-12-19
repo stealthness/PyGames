@@ -25,7 +25,7 @@ game_speed = 60  # Frames per second
 # Create a clock object to control the frame rate
 clock = pygame.time.Clock()
 
-# Font for title screen
+# Font for title screen and score
 font = pygame.font.Font(None, 36)
 
 # Create game objects
@@ -59,9 +59,13 @@ class Ball:
         pygame.draw.ellipse(screen, white, (self.x, self.y, self.size, self.size))
 
 # Create game objects
-player = Paddle(0, height // 2 - paddle_height // 2)
-opponent = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
+player1 = Paddle(0, height // 2 - paddle_height // 2)
+player2 = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
 ball = Ball()
+
+# Initialize scores
+player1_score = 0
+player2_score = 0
 
 # Title screen
 def show_title_screen():
@@ -88,6 +92,34 @@ def show_title_screen():
                 else:
                     return
 
+# Game over screen
+def show_game_over_screen():
+    screen.fill(black)
+    if player1_score > player2_score:
+        winner_text = font.render("Player 1 Wins!", True, white)
+    else:
+        winner_text = font.render("Player 2 Wins!", True, white)
+    winner_rect = winner_text.get_rect(center=(width // 2, height // 4))
+    screen.blit(winner_text, winner_rect)
+
+    restart_text = font.render("Press Space to Restart", True, white)
+    restart_rect = restart_text.get_rect(center=(width // 2, height // 2))
+    screen.blit(restart_text, restart_rect)
+
+    pygame.display.flip()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    quit()
+                elif event.key == pygame.K_SPACE:
+                    return
+
 # Game loop
 show_title_screen()
 
@@ -103,35 +135,53 @@ while True:
 
     # Player movement
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_w] and player.y > 0:
-        player.y -= 5
-    if keys[pygame.K_s] and player.y < height - player.height:
-        player.y += 5
+    if keys[pygame.K_w] and player1.y > 0:
+        player1.y -= 5
+    if keys[pygame.K_s] and player1.y < height - player1.height:
+        player1.y += 5
+    if keys[pygame.K_UP] and player2.y > 0:
+        player2.y -= 5
+    if keys[pygame.K_DOWN] and player2.y < height - player2.height:
+        player2.y += 5
 
     # Opponent AI (simple)
-    if ball.y > opponent.y + opponent.height // 2:
-        opponent.y += 5
-    if ball.y < opponent.y + opponent.height // 2:
-        opponent.y -= 5
+    if ball.y > player2.y + player2.height // 2:
+        player2.y += 5
+    if ball.y < player2.y + player2.height // 2:
+        player2.y -= 5
 
     # Ball movement and collisions
     ball.update()
 
     # Paddle collisions
-    if (ball.x <= player.x + player.width and ball.y >= player.y and ball.y <= player.y + player.height) or (
-            ball.x >= opponent.x - ball.size and ball.y >= opponent.y and ball.y <= opponent.y + opponent.height):
+    if (ball.x <= player1.x + player1.width and ball.y >= player1.y and ball.y <= player1.y + player1.height) or (
+            ball.x >= player2.x - ball.size and ball.y >= player2.y and ball.y <= player2.y + player2.height):
         ball.speed_x *= -1
 
-    # Game over (simplified)
-    if ball.x < 0 or ball.x > width:
-        ball.x = width // 2 - ball.size // 2
-        ball.y = height // 2 - ball.size // 2
-        ball.speed_x = random.choice([-3, 3])  # Randomize direction on reset
+    # Game over
+    if ball.x < 0:
+        player2_score += 1
+        show_game_over_screen()
+        player1 = Paddle(0, height // 2 - paddle_height // 2)
+        player2 = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
+        ball = Ball()
+    elif ball.x > width:
+        player1_score += 1
+        show_game_over_screen()
+        player1 = Paddle(0, height // 2 - paddle_height // 2)
+        player2 = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
+        ball = Ball()
 
     # Draw everything
     screen.fill(black)
-    player.draw()
-    opponent.draw()
+
+    # Draw score
+    score_text = font.render(f"Player 1: {player1_score} | Player 2: {player2_score}", True, white)
+    score_rect = score_text.get_rect(center=(width // 2, 20))
+    screen.blit(score_text, score_rect)
+
+    player1.draw()
+    player2.draw()
     ball.draw()
     pygame.draw.line(screen, white, (width // 2, 0), (width // 2, height))  # Center line
     pygame.display.flip()
