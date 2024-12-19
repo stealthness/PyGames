@@ -3,9 +3,7 @@ import sys
 import pygame
 from pygame import Vector2
 
-from DaFluffyPotato._Scripts import utils
 from _Scripts.player_class import Player
-from _Scripts.entities import PhysicsEntity
 
 
 class Game:
@@ -22,7 +20,6 @@ class Game:
         self.clock = pygame.time.Clock()
         self.FPS = 60
         self.dt = 1
-        # self.assets = {'cloud': utils.load_img('entities//player.png')}
         self.movement = [False, False, False, False]
         self.img_pos = [100, 100]
         self.collision_area = pygame.Rect(200, 200, 80, 80)
@@ -58,7 +55,6 @@ class Game:
                         self.movement[3] = False
 
             self.display.fill(self.BACKGROUND_Color)
-            # r = pygame.Rect(self.img_pos[0], self.img_pos[1], self.img.get_width(), self.img.get_height())
             r = pygame.Rect(*self.player.pos, *self.player.size)
 
             if r.colliderect(self.collision_area):
