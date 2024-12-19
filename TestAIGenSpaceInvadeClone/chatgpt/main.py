@@ -36,11 +36,15 @@ enemy_x_change = []
 enemy_y_change = []
 enemy_active = []  # Track if enemies are active
 
+initial_speed = 2
+speed_increment = 0.2
+current_speed = initial_speed
+
 for row in range(rows):
     for col in range(cols):
         enemy_x.append(50 + col * 70)
         enemy_y.append(50 + row * 50)
-        enemy_x_change.append(2)
+        enemy_x_change.append(initial_speed)
         enemy_y_change.append(40)
         enemy_active.append(True)
 
@@ -110,8 +114,10 @@ while running:
     player_x = max(0, min(SCREEN_WIDTH - 64, player_x))
 
     # Enemy Movement
+    active_enemy_count = 0
     for i in range(len(enemy_x)):
         if enemy_active[i]:  # Only update active enemies
+            active_enemy_count += 1
             enemy_x[i] += enemy_x_change[i]
 
             if enemy_x[i] <= 0 or enemy_x[i] >= 736:
@@ -126,6 +132,12 @@ while running:
                 enemy_active[i] = False  # Deactivate the enemy
 
             enemy(enemy_x[i], enemy_y[i], i)
+
+    # Increase speed as enemies are killed
+    if active_enemy_count < len(enemy_x):
+        current_speed = initial_speed + (len(enemy_x) - active_enemy_count) * speed_increment
+        for i in range(len(enemy_x_change)):
+            enemy_x_change[i] = current_speed if enemy_x_change[i] > 0 else -current_speed
 
     # Bullet Movement
     if bullet_state == "fire":
