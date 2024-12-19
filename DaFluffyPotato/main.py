@@ -56,21 +56,19 @@ class Game:
                         self.movement[2] = False
                     if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                         self.movement[3] = False
-                        
-                        
-                      
+
             self.display.fill(self.BACKGROUND_Color)
             # r = pygame.Rect(self.img_pos[0], self.img_pos[1], self.img.get_width(), self.img.get_height())
             r = pygame.Rect(*self.player.pos, *self.player.size)
-            
+
             if r.colliderect(self.collision_area):
                 pygame.draw.rect(self.display, (255, 200, 255), self.collision_area)
             else:
                 pygame.draw.rect(self.display, (255, 255, 255), self.collision_area)
 
-            vel = Vector2(self.movement[1] - self.movement[0],  self.movement[3] - self.movement[2])
+            vel = Vector2(self.movement[1] - self.movement[0], self.movement[3] - self.movement[2])
             self.player.velocity = vel
-            
+
             for entity in self.entities:
                 entity.update()
                 entity.render(self.display)
