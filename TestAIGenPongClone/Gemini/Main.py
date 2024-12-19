@@ -28,6 +28,9 @@ clock = pygame.time.Clock()
 # Font for title screen and score
 font = pygame.font.Font(None, 36)
 
+# Winning score
+winning_score = 3
+
 # Create game objects
 class Paddle:
     def __init__(self, x, y):
@@ -161,22 +164,28 @@ while True:
     # Game over
     if ball.x < 0:
         player2_score += 1
-        show_game_over_screen()
-        player1 = Paddle(0, height // 2 - paddle_height // 2)
-        player2 = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
-        ball = Ball()
+        if player2_score >= winning_score:
+            show_game_over_screen()
+            player1_score = 0
+            player2_score = 0
+            player1 = Paddle(0, height // 2 - paddle_height // 2)
+            player2 = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
+            ball = Ball()
     elif ball.x > width:
         player1_score += 1
-        show_game_over_screen()
-        player1 = Paddle(0, height // 2 - paddle_height // 2)
-        player2 = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
-        ball = Ball()
+        if player1_score >= winning_score:
+            show_game_over_screen()
+            player1_score = 0
+            player2_score = 0
+            player1 = Paddle(0, height // 2 - paddle_height // 2)
+            player2 = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
+            ball = Ball()
 
     # Draw everything
     screen.fill(black)
 
     # Draw score
-    score_text = font.render(f"Player 1: {player1_score} | Player 2: {player2_score}", True, white)
+    score_text = font.render(f"{player1_score} | {player2_score}", True, white)
     score_rect = score_text.get_rect(center=(width // 2, 20))
     screen.blit(score_text, score_rect)
 
