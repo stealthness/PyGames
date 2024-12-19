@@ -36,15 +36,17 @@ enemy_x_change = []
 enemy_y_change = []
 enemy_active = []  # Track if enemies are active
 
-initial_speed = 2
+initial_speed = 1  # Start slower
 speed_increment = 0.2
 current_speed = initial_speed
+
+enemy_direction = 1  # Shared direction for all enemies
 
 for row in range(rows):
     for col in range(cols):
         enemy_x.append(50 + col * 70)
         enemy_y.append(50 + row * 50)
-        enemy_x_change.append(initial_speed)
+        enemy_x_change.append(initial_speed * enemy_direction)
         enemy_y_change.append(40)
         enemy_active.append(True)
 
@@ -115,14 +117,15 @@ while running:
 
     # Enemy Movement
     active_enemy_count = 0
+    reverse_direction = False
+
     for i in range(len(enemy_x)):
         if enemy_active[i]:  # Only update active enemies
             active_enemy_count += 1
-            enemy_x[i] += enemy_x_change[i]
+            enemy_x[i] += enemy_x_change[i] * enemy_direction
 
             if enemy_x[i] <= 0 or enemy_x[i] >= 736:
-                enemy_x_change[i] *= -1
-                enemy_y[i] += enemy_y_change[i]
+                reverse_direction = True
 
             # Collision
             if is_collision(enemy_x[i], enemy_y[i], bullet_x, bullet_y):
@@ -133,11 +136,16 @@ while running:
 
             enemy(enemy_x[i], enemy_y[i], i)
 
+    if reverse_direction:
+        enemy_direction *= -1
+        for j in range(len(enemy_y)):
+            enemy_y[j] += 40
+
     # Increase speed as enemies are killed
     if active_enemy_count < len(enemy_x):
         current_speed = initial_speed + (len(enemy_x) - active_enemy_count) * speed_increment
         for i in range(len(enemy_x_change)):
-            enemy_x_change[i] = current_speed if enemy_x_change[i] > 0 else -current_speed
+            enemy_x_change[i] = current_speed
 
     # Bullet Movement
     if bullet_state == "fire":
