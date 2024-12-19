@@ -11,7 +11,9 @@ class Game:
         pygame.display.set_caption('DaFluffyPotato Tutorial')
         self.clock = pygame.time.Clock()
         self.FPS = 60
-        self.img = pygame.image.load('data/Art/clouds/cloud_1.png')
+        self.img = pygame.image.load('data/Art/clouds/cloud_1.png').convert_alpha()
+        self.movement = [False, False, False, False]
+        self.img_pos = [100, 100]
 
     def run(self):
         while True:
@@ -23,8 +25,33 @@ class Game:
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
                         pygame.init()
+                    if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                        self.movement[0] = True
+                    if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                        self.movement[1] = True
+                    if event.key == pygame.K_UP or event.key == pygame.K_w:
+                        self.movement[2] = True
+                    if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                        self.movement[3] = True
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                        self.movement[0] = False
+                    if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                        self.movement[1] = False
+                    if event.key == pygame.K_UP or event.key == pygame.K_w:
+                        self.movement[2] = False
+                    if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                        self.movement[3] = False
+                        
+                        
+                      
             self.screen.fill(self.BACKGROUND_Color)
-            self.screen.blit(self.img, (100, 100))
+            
+            self.img_pos[0] += self.movement[1] - self.movement[0]
+            self.img_pos[1] += self.movement[3] - self.movement[2]
+            
+            self.screen.blit(self.img, self.img_pos)
+            self.screen.blit(self.img, (200, 200))
             pygame.display.flip()
             self.clock.tick(self.FPS)
 
