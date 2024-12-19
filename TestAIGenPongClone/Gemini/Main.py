@@ -19,15 +19,6 @@ paddle_width, paddle_height = 10, 100
 # Ball dimensions
 ball_size = 20
 
-# Initial positions
-player_pos = height // 2 - paddle_height // 2
-opponent_pos = height // 2 - paddle_height // 2
-ball_x, ball_y = width // 2 - ball_size // 2, height // 2 - ball_size // 2
-
-# Initial ball speed (random direction)
-ball_speed_x = random.choice([-3, 3])
-ball_speed_y = random.choice([-3, 3])
-
 # Game speed control
 game_speed = 60  # Frames per second
 
@@ -37,25 +28,55 @@ clock = pygame.time.Clock()
 # Font for title screen
 font = pygame.font.Font(None, 36)
 
-# Title screen flag
-show_title_screen = True
+# Create game objects
+class Paddle:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.width = paddle_width
+        self.height = paddle_height
 
-# Game loop
-while True:
-    if show_title_screen:
-        # Draw title screen
-        screen.fill(black)
-        title_text = font.render("Pong", True, white)
-        title_rect = title_text.get_rect(center=(width // 2, height // 4))
-        screen.blit(title_text, title_rect)
+    def draw(self):
+        pygame.draw.rect(screen, white, (self.x, self.y, self.width, self.height))
 
-        start_text = font.render("Press any key to start", True, white)
-        start_rect = start_text.get_rect(center=(width // 2, height // 2))
-        screen.blit(start_text, start_rect)
+class Ball:
+    def __init__(self):
+        self.x = width // 2 - ball_size // 2
+        self.y = height // 2 - ball_size // 2
+        self.speed_x = random.choice([-3, 3])
+        self.speed_y = random.choice([-3, 3])
+        self.size = ball_size
 
-        pygame.display.flip()
+    def update(self):
+        self.x += self.speed_x
+        self.y += self.speed_y
 
-        # Handle events during title screen
+        # Wall collisions
+        if self.y <= 0 or self.y >= height - self.size:
+            self.speed_y *= -1
+
+    def draw(self):
+        pygame.draw.ellipse(screen, white, (self.x, self.y, self.size, self.size))
+
+# Create game objects
+player = Paddle(0, height // 2 - paddle_height // 2)
+opponent = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
+ball = Ball()
+
+# Title screen
+def show_title_screen():
+    screen.fill(black)
+    title_text = font.render("Pong", True, white)
+    title_rect = title_text.get_rect(center=(width // 2, height // 4))
+    screen.blit(title_text, title_rect)
+
+    start_text = font.render("Press any key to start", True, white)
+    start_rect = start_text.get_rect(center=(width // 2, height // 2))
+    screen.blit(start_text, start_rect)
+
+    pygame.display.flip()
+
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -65,57 +86,55 @@ while True:
                     pygame.quit()
                     quit()
                 else:
-                    show_title_screen = False
+                    return
 
-    else:
-        # Game loop
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+# Game loop
+show_title_screen()
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 quit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    quit()
 
-        # Player movement
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_w] and player_pos > 0:
-            player_pos -= 5
-        if keys[pygame.K_s] and player_pos < height - paddle_height:
-            player_pos += 5
+    # Player movement
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_w] and player.y > 0:
+        player.y -= 5
+    if keys[pygame.K_s] and player.y < height - player.height:
+        player.y += 5
 
-        # Opponent AI (simple)
-        if ball_y > opponent_pos + paddle_height // 2:
-            opponent_pos += 5
-        if ball_y < opponent_pos + paddle_height // 2:
-            opponent_pos -= 5
+    # Opponent AI (simple)
+    if ball.y > opponent.y + opponent.height // 2:
+        opponent.y += 5
+    if ball.y < opponent.y + opponent.height // 2:
+        opponent.y -= 5
 
-        # Ball movement
-        ball_x += ball_speed_x
-        ball_y += ball_speed_y
+    # Ball movement and collisions
+    ball.update()
 
-        # Ball collision with walls
-        if ball_y <= 0 or ball_y >= height - ball_size:
-            ball_speed_y *= -1
+    # Paddle collisions
+    if (ball.x <= player.x + player.width and ball.y >= player.y and ball.y <= player.y + player.height) or (
+            ball.x >= opponent.x - ball.size and ball.y >= opponent.y and ball.y <= opponent.y + opponent.height):
+        ball.speed_x *= -1
 
-        # Ball collision with paddles
-        if (ball_x <= paddle_width and ball_y >= player_pos and ball_y <= player_pos + paddle_height) or (
-                ball_x >= width - paddle_width - ball_size and ball_y >= opponent_pos and ball_y <= opponent_pos + paddle_height):
-            ball_speed_x *= -1
+    # Game over (simplified)
+    if ball.x < 0 or ball.x > width:
+        ball.x = width // 2 - ball.size // 2
+        ball.y = height // 2 - ball.size // 2
+        ball.speed_x = random.choice([-3, 3])  # Randomize direction on reset
 
-        # Game over (simplified)
-        if ball_x < 0 or ball_x > width:
-            ball_x, ball_y = width // 2 - ball_size // 2, height // 2 - ball_size // 2
-            ball_speed_x = random.choice([-3, 3])  # Randomize direction on reset
+    # Draw everything
+    screen.fill(black)
+    player.draw()
+    opponent.draw()
+    ball.draw()
+    pygame.draw.line(screen, white, (width // 2, 0), (width // 2, height))  # Center line
+    pygame.display.flip()
 
-        # Draw everything
-        screen.fill(black)
-        pygame.draw.rect(screen, white, (0, player_pos, paddle_width, paddle_height))
-        pygame.draw.rect(screen, white, (width - paddle_width, opponent_pos, paddle_width, paddle_height))
-        pygame.draw.ellipse(screen, white, (ball_x, ball_y, ball_size, ball_size))
-        pygame.draw.line(screen, white, (width // 2, 0), (width // 2, height))  # Center line
-        pygame.display.flip()
-
-        # Cap the frame rate
-        clock.tick(game_speed)
+    # Cap the frame rate
+    clock.tick(game_speed)
