@@ -1,6 +1,9 @@
 import sys
 
 import pygame
+from pygame import Vector2
+
+from _Scripts.entities import PhysicsEntity
 
 
 class Game:
@@ -11,10 +14,13 @@ class Game:
         pygame.display.set_caption('DaFluffyPotato Tutorial')
         self.clock = pygame.time.Clock()
         self.FPS = 60
+        self.dt = 1
         self.img = pygame.image.load('data/Art/clouds/cloud_1.png').convert_alpha()
         self.movement = [False, False, False, False]
         self.img_pos = [100, 100]
         self.collision_area = pygame.Rect(200, 200, 80, 80)
+        self.player = PhysicsEntity(self, 'player', (100, 100), (32, 32))
+        self.entities = [self.player]
 
     def run(self):
         while True:
@@ -48,16 +54,19 @@ class Game:
                       
             self.screen.fill(self.BACKGROUND_Color)
             # r = pygame.Rect(self.img_pos[0], self.img_pos[1], self.img.get_width(), self.img.get_height())
-            r = pygame.Rect(*self.img_pos, *self.img.get_size())
+            r = pygame.Rect(*self.player.pos, *self.player.size)
             
             if r.colliderect(self.collision_area):
                 pygame.draw.rect(self.screen, (255, 200, 255), self.collision_area)
             else:
                 pygame.draw.rect(self.screen, (255, 255, 255), self.collision_area)
 
+            vel = Vector2(self.movement[1] - self.movement[0],  self.movement[3] - self.movement[2])
+            self.player.velocity = vel
             
-            self.img_pos[0] += self.movement[1] - self.movement[0]
-            self.img_pos[1] += self.movement[3] - self.movement[2]
+            for entity in self.entities:
+                entity.update()
+                entity.render(self.screen)
         
             self.screen.blit(self.img, self.img_pos)
             self.screen.blit(self.img, (200, 200))
