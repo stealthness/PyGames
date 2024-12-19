@@ -1,4 +1,5 @@
 import pygame
+import random
 
 # Initialize Pygame
 pygame.init()
@@ -23,8 +24,9 @@ player_pos = height // 2 - paddle_height // 2
 opponent_pos = height // 2 - paddle_height // 2
 ball_x, ball_y = width // 2 - ball_size // 2, height // 2 - ball_size // 2
 
-# Ball speed
-ball_speed_x, ball_speed_y = 3, 3
+# Initial ball speed (random direction)
+ball_speed_x = random.choice([-3, 3])
+ball_speed_y = random.choice([-3, 3])
 
 # Game speed control
 game_speed = 60  # Frames per second
@@ -35,13 +37,13 @@ clock = pygame.time.Clock()
 # Game loop
 running = True
 while running:
-    # Cap the frame rate
-    clock.tick(game_speed)
-
     # Event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
 
     # Player movement
     keys = pygame.key.get_pressed()
@@ -72,13 +74,18 @@ while running:
     # Game over (simplified)
     if ball_x < 0 or ball_x > width:
         ball_x, ball_y = width // 2 - ball_size // 2, height // 2 - ball_size // 2
+        ball_speed_x = random.choice([-3, 3])  # Randomize direction on reset
 
     # Draw everything
     screen.fill(black)
     pygame.draw.rect(screen, white, (0, player_pos, paddle_width, paddle_height))
     pygame.draw.rect(screen, white, (width - paddle_width, opponent_pos, paddle_width, paddle_height))
     pygame.draw.ellipse(screen, white, (ball_x, ball_y, ball_size, ball_size))
+    pygame.draw.line(screen, white, (width // 2, 0), (width // 2, height))  # Center line
     pygame.display.flip()
+
+    # Cap the frame rate
+    clock.tick(game_speed)
 
 # Quit Pygame
 pygame.quit()
