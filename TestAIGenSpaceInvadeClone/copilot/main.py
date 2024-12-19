@@ -16,7 +16,7 @@ RED = (255, 0, 0)
 
 # Create Screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Space Invaders")
+pygame.display.set_caption("(Copilot) Space Invaders")
 
 # Load assets
 player_img = pygame.image.load("../Art/player.png")
@@ -162,3 +162,5 @@ while running:
 
     pygame.display.update()
     clock.tick(60)
+
+pygame.quit()
