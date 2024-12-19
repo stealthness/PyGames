@@ -62,34 +62,33 @@ font = pygame.font.Font(None, 36)
 # Clock for controlling FPS
 clock = pygame.time.Clock()
 
-
 # Functions
 def player(x, y):
     screen.blit(player_img, (x, y))
 
-
 def enemy(x, y, i):
     screen.blit(enemy_img, (x, y))
-
 
 def fire_bullet(x, y):
     global bullet_state
     bullet_state = "fire"
     screen.blit(bullet_img, (x + 16, y + 10))
 
-
-def is_collision(enemy_x, enemy_y, bullet_x, bullet_y):
-    distance = math.sqrt((math.pow(enemy_x - bullet_x, 2)) + (math.pow(enemy_y - bullet_y, 2)))
-    return distance < 27
-
+def is_collision(obj1_x, obj1_y, obj2_x, obj2_y, distance_threshold):
+    distance = math.sqrt((math.pow(obj1_x - obj2_x, 2)) + (math.pow(obj1_y - obj2_y, 2)))
+    return distance < distance_threshold
 
 def show_score():
     score_text = font.render(f"Score: {score}", True, WHITE)
     screen.blit(score_text, (10, 10))
 
+def show_game_over():
+    game_over_text = font.render("Game Over! Press R to Restart", True, RED)
+    screen.blit(game_over_text, (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 20))
 
 # Game Loop
 running = True
+game_over = False
 while running:
     screen.fill(BLACK)
 
@@ -107,58 +106,77 @@ while running:
                 if bullet_state == "ready":
                     bullet_x = player_x
                     fire_bullet(bullet_x, bullet_y)
+            if event.key == pygame.K_r and game_over:
+                # Restart the game
+                game_over = False
+                score = 0
+                player_x = 370
+                player_y = 480
+                bullet_y = 480
+                bullet_state = "ready"
+                enemy_x = [50 + col * 70 for row in range(rows) for col in range(cols)]
+                enemy_y = [50 + row * 50 for row in range(rows) for col in range(cols)]
+                enemy_active = [True] * (rows * cols)
+                current_speed = initial_speed
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 player_x_change = 0
 
-    # Player Movement
-    player_x += player_x_change
-    player_x = max(0, min(SCREEN_WIDTH - 64, player_x))
+    if not game_over:
+        # Player Movement
+        player_x += player_x_change
+        player_x = max(0, min(SCREEN_WIDTH - 64, player_x))
 
-    # Enemy Movement
-    active_enemy_count = 0
-    reverse_direction = False
+        # Enemy Movement
+        active_enemy_count = 0
+        reverse_direction = False
 
-    for i in range(len(enemy_x)):
-        if enemy_active[i]:  # Only update active enemies
-            active_enemy_count += 1
-            enemy_x[i] += enemy_x_change[i] * enemy_direction
+        for i in range(len(enemy_x)):
+            if enemy_active[i]:  # Only update active enemies
+                active_enemy_count += 1
+                enemy_x[i] += enemy_x_change[i] * enemy_direction
 
-            if enemy_x[i] <= 0 or enemy_x[i] >= 736:
-                reverse_direction = True
+                if enemy_x[i] <= 0 or enemy_x[i] >= 736:
+                    reverse_direction = True
 
-            # Collision
-            if is_collision(enemy_x[i], enemy_y[i], bullet_x, bullet_y):
-                bullet_y = 480
-                bullet_state = "ready"
-                score += 1
-                enemy_active[i] = False  # Deactivate the enemy
+                # Collision with bullet
+                if is_collision(enemy_x[i], enemy_y[i], bullet_x, bullet_y, 27):
+                    bullet_y = 480
+                    bullet_state = "ready"
+                    score += 1
+                    enemy_active[i] = False  # Deactivate the enemy
 
-            enemy(enemy_x[i], enemy_y[i], i)
+                # Collision with player
+                if is_collision(enemy_x[i], enemy_y[i], player_x, player_y, 27):
+                    game_over = True
 
-    if reverse_direction:
-        enemy_direction *= -1
-        for j in range(len(enemy_y)):
-            enemy_y[j] += enemy_drop_rate  # Use adjustable drop rate
+                enemy(enemy_x[i], enemy_y[i], i)
 
-    # Increase speed as enemies are killed
-    if active_enemy_count < len(enemy_x):
-        current_speed = initial_speed + (len(enemy_x) - active_enemy_count) * speed_increment
-        for i in range(len(enemy_x_change)):
-            enemy_x_change[i] = current_speed
+        if reverse_direction:
+            enemy_direction *= -1
+            for j in range(len(enemy_y)):
+                enemy_y[j] += enemy_drop_rate  # Use adjustable drop rate
 
-    # Bullet Movement
-    if bullet_state == "fire":
-        fire_bullet(bullet_x, bullet_y)
-        bullet_y -= bullet_y_change
+        # Increase speed as enemies are killed
+        if active_enemy_count < len(enemy_x):
+            current_speed = initial_speed + (len(enemy_x) - active_enemy_count) * speed_increment
+            for i in range(len(enemy_x_change)):
+                enemy_x_change[i] = current_speed
 
-    if bullet_y <= 0:
-        bullet_y = 480
-        bullet_state = "ready"
+        # Bullet Movement
+        if bullet_state == "fire":
+            fire_bullet(bullet_x, bullet_y)
+            bullet_y -= bullet_y_change
 
-    player(player_x, player_y)
-    show_score()
+        if bullet_y <= 0:
+            bullet_y = 480
+            bullet_state = "ready"
+
+        player(player_x, player_y)
+        show_score()
+    else:
+        show_game_over()
 
     pygame.display.update()
     clock.tick(60)
