@@ -55,11 +55,17 @@ while True:
 
         pygame.display.flip()
 
-        # Wait for any key press to start the game
+        # Handle events during title screen
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                show_title_screen = False
-                break
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    quit()
+                else:
+                    show_title_screen = False
 
     else:
         # Game loop
