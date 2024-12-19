@@ -165,3 +165,7 @@ cython_debug/
 art/
 
 Flappy*Bird*Clone/
+
+**/Art/
+**/Sounds/
+**/Tilemaps/
