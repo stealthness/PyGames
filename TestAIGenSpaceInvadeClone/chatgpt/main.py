@@ -28,11 +28,21 @@ player_x = 370
 player_y = 480
 player_x_change = 0
 
-num_of_enemies = 6
-enemy_x = [random.randint(0, 735) for _ in range(num_of_enemies)]
-enemy_y = [random.randint(50, 150) for _ in range(num_of_enemies)]
-enemy_x_change = [4 for _ in range(num_of_enemies)]
-enemy_y_change = [40 for _ in range(num_of_enemies)]
+rows = 5
+cols = 10
+enemy_x = []
+enemy_y = []
+enemy_x_change = []
+enemy_y_change = []
+enemy_active = []  # Track if enemies are active
+
+for row in range(rows):
+    for col in range(cols):
+        enemy_x.append(50 + col * 70)
+        enemy_y.append(50 + row * 50)
+        enemy_x_change.append(2)
+        enemy_y_change.append(40)
+        enemy_active.append(True)
 
 bullet_x = 0
 bullet_y = 480
@@ -41,6 +51,9 @@ bullet_state = "ready"
 
 score = 0
 font = pygame.font.Font(None, 36)
+
+# Clock for controlling FPS
+clock = pygame.time.Clock()
 
 
 # Functions
@@ -97,22 +110,22 @@ while running:
     player_x = max(0, min(SCREEN_WIDTH - 64, player_x))
 
     # Enemy Movement
-    for i in range(num_of_enemies):
-        enemy_x[i] += enemy_x_change[i]
+    for i in range(len(enemy_x)):
+        if enemy_active[i]:  # Only update active enemies
+            enemy_x[i] += enemy_x_change[i]
 
-        if enemy_x[i] <= 0 or enemy_x[i] >= 736:
-            enemy_x_change[i] *= -1
-            enemy_y[i] += enemy_y_change[i]
+            if enemy_x[i] <= 0 or enemy_x[i] >= 736:
+                enemy_x_change[i] *= -1
+                enemy_y[i] += enemy_y_change[i]
 
-        # Collision
-        if is_collision(enemy_x[i], enemy_y[i], bullet_x, bullet_y):
-            bullet_y = 480
-            bullet_state = "ready"
-            score += 1
-            enemy_x[i] = random.randint(0, 735)
-            enemy_y[i] = random.randint(50, 150)
+            # Collision
+            if is_collision(enemy_x[i], enemy_y[i], bullet_x, bullet_y):
+                bullet_y = 480
+                bullet_state = "ready"
+                score += 1
+                enemy_active[i] = False  # Deactivate the enemy
 
-        enemy(enemy_x[i], enemy_y[i], i)
+            enemy(enemy_x[i], enemy_y[i], i)
 
     # Bullet Movement
     if bullet_state == "fire":
@@ -127,3 +140,4 @@ while running:
     show_score()
 
     pygame.display.update()
+    clock.tick(60)
