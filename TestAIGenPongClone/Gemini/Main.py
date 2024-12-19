@@ -164,22 +164,24 @@ while True:
     # Game over
     if ball.x < 0:
         player2_score += 1
-        if player2_score >= winning_score:
-            show_game_over_screen()
-            player1_score = 0
-            player2_score = 0
-            player1 = Paddle(0, height // 2 - paddle_height // 2)
-            player2 = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
-            ball = Ball()
     elif ball.x > width:
         player1_score += 1
-        if player1_score >= winning_score:
-            show_game_over_screen()
-            player1_score = 0
-            player2_score = 0
-            player1 = Paddle(0, height // 2 - paddle_height // 2)
-            player2 = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
-            ball = Ball()
+
+    # Check for game win
+    if player1_score >= winning_score:
+        show_game_over_screen()
+        player1_score = 0
+        player2_score = 0
+        player1 = Paddle(0, height // 2 - paddle_height // 2)
+        player2 = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
+        ball = Ball()
+    elif player2_score >= winning_score:
+        show_game_over_screen()
+        player1_score = 0
+        player2_score = 0
+        player1 = Paddle(0, height // 2 - paddle_height // 2)
+        player2 = Paddle(width - paddle_width, height // 2 - paddle_height // 2)
+        ball = Ball()
 
     # Draw everything
     screen.fill(black)
