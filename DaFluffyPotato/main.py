@@ -12,12 +12,17 @@ class Game:
     def __init__(self):
         pygame.init()
         self.BACKGROUND_Color = (200, 200, 250)
-        self.screen = pygame.display.set_mode((640, 480))
+        self.DISPLAY_WIDTH = 320
+        self.DISPLAY_HEIGHT = 240
+        self.SCREEN_SCALE = 4
+        self.display = pygame.Surface((self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT))
+        self.screen = pygame.display.set_mode((self.DISPLAY_WIDTH * self.SCREEN_SCALE,
+                                               self.DISPLAY_HEIGHT * self.SCREEN_SCALE))
         pygame.display.set_caption('DaFluffyPotato Tutorial')
         self.clock = pygame.time.Clock()
         self.FPS = 60
         self.dt = 1
-        self.assets = {'cloud': utils.load_img('entities//player.png')}
+        # self.assets = {'cloud': utils.load_img('entities//player.png')}
         self.movement = [False, False, False, False]
         self.img_pos = [100, 100]
         self.collision_area = pygame.Rect(200, 200, 80, 80)
@@ -54,22 +59,22 @@ class Game:
                         
                         
                       
-            self.screen.fill(self.BACKGROUND_Color)
+            self.display.fill(self.BACKGROUND_Color)
             # r = pygame.Rect(self.img_pos[0], self.img_pos[1], self.img.get_width(), self.img.get_height())
             r = pygame.Rect(*self.player.pos, *self.player.size)
             
             if r.colliderect(self.collision_area):
-                pygame.draw.rect(self.screen, (255, 200, 255), self.collision_area)
+                pygame.draw.rect(self.display, (255, 200, 255), self.collision_area)
             else:
-                pygame.draw.rect(self.screen, (255, 255, 255), self.collision_area)
+                pygame.draw.rect(self.display, (255, 255, 255), self.collision_area)
 
             vel = Vector2(self.movement[1] - self.movement[0],  self.movement[3] - self.movement[2])
             self.player.velocity = vel
             
             for entity in self.entities:
                 entity.update()
-                entity.render(self.screen)
-
+                entity.render(self.display)
+            self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
             pygame.display.flip()
             self.clock.tick(self.FPS)
 
