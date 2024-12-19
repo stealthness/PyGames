@@ -51,7 +51,9 @@ class Game:
             r = pygame.Rect(*self.img_pos, *self.img.get_size())
             
             if r.colliderect(self.collision_area):
-                pygame.draw.rect(self.screen, (255, 0, 0), self.collision_area)
+                pygame.draw.rect(self.screen, (255, 200, 255), self.collision_area)
+            else:
+                pygame.draw.rect(self.screen, (255, 255, 255), self.collision_area)
 
             
             self.img_pos[0] += self.movement[1] - self.movement[0]
