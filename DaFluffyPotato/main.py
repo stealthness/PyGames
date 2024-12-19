@@ -3,6 +3,7 @@ import sys
 import pygame
 from pygame import Vector2
 
+from DaFluffyPotato._Scripts import utils
 from _Scripts.player_class import Player
 from _Scripts.entities import PhysicsEntity
 
@@ -16,7 +17,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.FPS = 60
         self.dt = 1
-        self.img = pygame.image.load('data/Art/clouds/cloud_1.png').convert_alpha()
+        self.assets = {'cloud': utils.load_img('entities//player.png')}
         self.movement = [False, False, False, False]
         self.img_pos = [100, 100]
         self.collision_area = pygame.Rect(200, 200, 80, 80)
@@ -68,9 +69,7 @@ class Game:
             for entity in self.entities:
                 entity.update()
                 entity.render(self.screen)
-        
-            self.screen.blit(self.img, self.img_pos)
-            self.screen.blit(self.img, (200, 200))
+
             pygame.display.flip()
             self.clock.tick(self.FPS)
 
