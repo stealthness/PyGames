@@ -22,11 +22,22 @@ ball_size = 20
 player_pos = height // 2 - paddle_height // 2
 opponent_pos = height // 2 - paddle_height // 2
 ball_x, ball_y = width // 2 - ball_size // 2, height // 2 - ball_size // 2
+
+# Ball speed
 ball_speed_x, ball_speed_y = 3, 3
+
+# Game speed control
+game_speed = 60  # Frames per second
+
+# Create a clock object to control the frame rate
+clock = pygame.time.Clock()
 
 # Game loop
 running = True
 while running:
+    # Cap the frame rate
+    clock.tick(game_speed)
+
     # Event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
