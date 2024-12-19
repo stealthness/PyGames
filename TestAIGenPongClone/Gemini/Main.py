@@ -161,7 +161,7 @@ while True:
             ball.x >= player2.x - ball.size and ball.y >= player2.y and ball.y <= player2.y + player2.height):
         ball.speed_x *= -1
 
-    # Game over
+    # Check for scoring
     if ball.x < 0:
         player2_score += 1
     elif ball.x > width:
