@@ -3,6 +3,7 @@ import sys
 import pygame
 from pygame import Vector2
 
+from _Scripts.player_class import Player
 from _Scripts.entities import PhysicsEntity
 
 
@@ -19,7 +20,7 @@ class Game:
         self.movement = [False, False, False, False]
         self.img_pos = [100, 100]
         self.collision_area = pygame.Rect(200, 200, 80, 80)
-        self.player = PhysicsEntity(self, 'player', (100, 100), (32, 32))
+        self.player = Player(self, 'player', Vector2(100, 100), (32, 32))
         self.entities = [self.player]
 
     def run(self):
