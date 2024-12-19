@@ -118,6 +118,7 @@ while running:
                 enemy_y = [50 + row * 50 for row in range(rows) for col in range(cols)]
                 enemy_active = [True] * (rows * cols)
                 current_speed = initial_speed
+                enemy_x_change = [initial_speed * enemy_direction for _ in range(rows * cols)]
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
