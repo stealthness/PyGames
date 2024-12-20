@@ -3,6 +3,8 @@ import sys
 import pygame
 from pygame import Vector2
 
+from DaFluffyPotato._Scripts import utils
+from DaFluffyPotato._Scripts.tilemap import Tilemap
 from _Scripts.player_class import Player
 
 
@@ -24,7 +26,15 @@ class Game:
         self.img_pos = [100, 100]
         self.collision_area = pygame.Rect(200, 200, 80, 80)
         self.player = Player(self, 'player', Vector2(100, 100), (32, 32))
+        self.assets = {
+            'decor': utils.load_images('tiles\\decor'),
+            'grass': utils.load_images('tiles\\grass'),
+            'stone': utils.load_images('tiles\\stone'),
+            
+            
+        }
         self.entities = [self.player]
+        self.tilemap = Tilemap(self, 16)
 
     def run(self):
         while True:
@@ -68,6 +78,7 @@ class Game:
             for entity in self.entities:
                 entity.update()
                 entity.render(self.display)
+            self.tilemap.render(self.display)
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
             pygame.display.flip()
             self.clock.tick(self.FPS)
