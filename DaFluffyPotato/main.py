@@ -20,8 +20,9 @@ class Game:
                                                self.DISPLAY_HEIGHT * self.SCREEN_SCALE))
         pygame.display.set_caption('DaFluffyPotato Tutorial')
         self.clock = pygame.time.Clock()
+        self.unit = 16
         self.FPS = 60
-        self.dt = 1
+        self.dt = 1 / self.FPS
         self.movement = [False, False, False, False]
         self.img_pos = [100, 100]
         self.collision_area = pygame.Rect(200, 200, 80, 80)
@@ -73,8 +74,8 @@ class Game:
             else:
                 pygame.draw.rect(self.display, (255, 255, 255), self.collision_area)
 
-            vel = Vector2(self.movement[1] - self.movement[0], self.movement[3] - self.movement[2])
-            self.player.velocity = vel
+            dir = Vector2(float(self.movement[1] - self.movement[0]), float(self.movement[3] - self.movement[2]))
+            self.player.move(dir)
 
             if len(self.tilemap.tiles_around(self.player.pos)) > 0:
                 print(self.tilemap.physics_rects_around(self.player.pos))
