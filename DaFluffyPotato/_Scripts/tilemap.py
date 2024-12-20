@@ -20,3 +20,6 @@ class Tilemap:
             tile = self.tilemap[loc]
             surface.blit(self.game.assets[tile['type']][tile['varient']],
                          (tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size))
+
+        for tile in self.offgrid_tiles:
+            surface.blit(self.game.assets[tile['type']][tile['varient']], tile['pos'])
