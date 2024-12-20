@@ -26,7 +26,7 @@ class Game:
         self.movement = [False, False, False, False]
         self.img_pos = [100, 100]
         self.collision_area = pygame.Rect(200, 200, 80, 80)
-        self.player = Player(self, 'player', Vector2(100, 100), (32, 32))
+        self.player = Player(self, 'player', Vector2(100, 100), (16, 16))
         self.assets = {
             'decor': utils.load_images('tiles\\decor'),
             'grass': utils.load_images('tiles\\grass'),
@@ -80,10 +80,10 @@ class Game:
             if len(self.tilemap.tiles_around(self.player.pos)) > 0:
                 print(self.tilemap.physics_rects_around(self.player.pos))
 
+            self.tilemap.render(self.display)
             for entity in self.entities:
                 entity.update(self.tilemap)
                 entity.render(self.display)
-            self.tilemap.render(self.display)
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
             pygame.display.flip()
             self.clock.tick(self.FPS)
