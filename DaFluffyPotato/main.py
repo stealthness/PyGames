@@ -35,6 +35,7 @@ class Game:
         }
         self.entities = [self.player]
         self.tilemap = Tilemap(self, 16)
+        print(self.tilemap)
 
     def run(self):
         while True:
@@ -75,8 +76,11 @@ class Game:
             vel = Vector2(self.movement[1] - self.movement[0], self.movement[3] - self.movement[2])
             self.player.velocity = vel
 
+            if len(self.tilemap.tiles_around(self.player.pos)) > 0:
+                print(self.tilemap.physics_rects_around(self.player.pos))
+
             for entity in self.entities:
-                entity.update()
+                entity.update(self.tilemap)
                 entity.render(self.display)
             self.tilemap.render(self.display)
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
