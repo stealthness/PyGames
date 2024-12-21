@@ -8,7 +8,7 @@ class CandyCane:
     def __init__(self, pos=Vector2(0, 0)):
 
         self.pos = self.get_random_start_position()
-        self.image = pygame.image.load('Art/CandyCane.png')
+        self.image = pygame.image.load('Art/CandyCane.png').convert_alpha()
         self.rect = pygame.Rect(self.pos.x, self.pos.y, 32, 32)
         self.speed = 2
         self.active = True
@@ -39,7 +39,6 @@ class CandyCane:
             screen.blit(self.image, self.pos)
 
     def point_collided(self, point: Vector2):
-        print(f'point_collided: {point}, self.pos: {self.pos}, type: {type(self)}, self.rect: {type(self.rect)}')
         if self.rect.collidepoint(point.x, point.y):
             self.active = False
             return True
