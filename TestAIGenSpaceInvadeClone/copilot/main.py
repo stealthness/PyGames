@@ -80,11 +80,20 @@ def is_collision(obj1_x, obj1_y, obj2_x, obj2_y, distance_threshold):
 
 def show_score():
     score_text = font.render(f"Score: {score}", True, WHITE)
-    screen.blit(score_text, (10, 10))
+    text_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, 20))
+    screen.blit(score_text, text_rect)
 
 def show_game_over():
     game_over_text = font.render("Game Over! Press R to Restart", True, RED)
     screen.blit(game_over_text, (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 20))
+
+def reset_enemies():
+    global enemy_x, enemy_y, enemy_active, current_speed, enemy_x_change
+    enemy_x = [50 + col * 70 for row in range(rows) for col in range(cols)]
+    enemy_y = [50 + row * 50 for row in range(rows) for col in range(cols)]
+    enemy_active = [True] * (rows * cols)
+    current_speed = initial_speed
+    enemy_x_change = [initial_speed * enemy_direction for _ in range(rows * cols)]
 
 # Game Loop
 running = True
@@ -114,11 +123,7 @@ while running:
                 player_y = 480
                 bullet_y = 480
                 bullet_state = "ready"
-                enemy_x = [50 + col * 70 for row in range(rows) for col in range(cols)]
-                enemy_y = [50 + row * 50 for row in range(rows) for col in range(cols)]
-                enemy_active = [True] * (rows * cols)
-                current_speed = initial_speed
-                enemy_x_change = [initial_speed * enemy_direction for _ in range(rows * cols)]
+                reset_enemies()
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
@@ -164,6 +169,10 @@ while running:
             current_speed = initial_speed + (len(enemy_x) - active_enemy_count) * speed_increment
             for i in range(len(enemy_x_change)):
                 enemy_x_change[i] = current_speed
+
+        # Check if all enemies are inactive
+        if active_enemy_count == 0:
+            reset_enemies()
 
         # Bullet Movement
         if bullet_state == "fire":
