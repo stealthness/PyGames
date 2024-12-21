@@ -16,7 +16,6 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 
-
 class Game:
     def __init__(self):
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -59,7 +58,7 @@ class Game:
         if not self.game_over:
             self.player.update()
             self.bullet.update()
-            self.enemies.update(self.bullet, self.player)
+            self.enemies.update(self.bullet, self.player, self)
             self.check_collisions()
             if self.enemies.all_inactive():
                 self.enemies.reset()
@@ -76,12 +75,16 @@ class Game:
 
     def check_collisions(self):
         for i, (ex, ey, active) in enumerate(zip(self.enemies.x, self.enemies.y, self.enemies.active)):
-            if active and self.bullet.is_collision(ex, ey):
+            if active and self.bullet.is_collision(ex, ey, self):
+                print("Collision")
                 self.bullet.reset()
                 self.score += 1
                 self.enemies.active[i] = False
             if active and self.player.is_collision(ex, ey):
                 self.game_over = True
+
+    def update_score(self):
+        self.score += 1
 
     def show_score(self):
         score_text = self.font.render(f"Score: {self.score}", True, WHITE)
@@ -98,8 +101,6 @@ class Game:
         self.player.reset()
         self.bullet.reset()
         self.enemies.reset()
-
-
 if __name__ == "__main__":
     game = Game()
     game.run()

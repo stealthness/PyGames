@@ -30,5 +30,8 @@ class Bullet:
         self.state = "ready"
         self.y = 480
 
-    def is_collision(self, ex, ey):
-        return math.sqrt((math.pow(self.x - ex, 2)) + (math.pow(self.y - ey, 2))) < 27
+    def is_collision(self, ex, ey, game):
+        if math.sqrt((math.pow(self.x - ex, 2)) + (math.pow(self.y - ey, 2))) < 27:
+            game.update_score()
+            return True
+        return False

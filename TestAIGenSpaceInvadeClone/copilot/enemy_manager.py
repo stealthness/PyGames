@@ -19,7 +19,7 @@ class EnemyManager:
         self.active = [True] * (self.rows * self.cols)
         self.current_speed = self.initial_speed
 
-    def update(self, bullet, player):
+    def update(self, bullet, player, game):
         active_enemy_count = 0
         reverse_direction = False
 
@@ -31,7 +31,7 @@ class EnemyManager:
                 if self.x[i] <= 0 or self.x[i] >= 736:
                     reverse_direction = True
 
-                if bullet.is_collision(self.x[i], self.y[i]):
+                if bullet.is_collision(self.x[i], self.y[i], game):
                     bullet.reset()
                     self.active[i] = False
 

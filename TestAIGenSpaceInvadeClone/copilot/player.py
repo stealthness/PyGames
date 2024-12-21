@@ -2,9 +2,7 @@ import math
 
 import pygame
 
-from TestAIGenSpaceInvadeClone.copilot.main import SCREEN_WIDTH
-
-
+SCREEN_WIDTH = 800
 class Player:
     def __init__(self):
         self.image = pygame.image.load("../Art/player.png")
