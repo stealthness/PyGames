@@ -1,6 +1,8 @@
 import pygame
-import random
-import math
+
+from TestAIGenSpaceInvadeClone.copilot.bullet import Bullet
+from TestAIGenSpaceInvadeClone.copilot.enemy_manager import EnemyManager
+from TestAIGenSpaceInvadeClone.copilot.player import Player
 
 # Initialize Pygame
 pygame.init()
@@ -96,116 +98,6 @@ class Game:
         self.player.reset()
         self.bullet.reset()
         self.enemies.reset()
-
-
-class Player:
-    def __init__(self):
-        self.image = pygame.image.load("../Art/player.png")
-        self.x = 370
-        self.y = 480
-        self.change_x = 0
-
-    def update(self):
-        self.x += self.change_x
-        self.x = max(0, min(SCREEN_WIDTH - 64, self.x))
-
-    def draw(self, screen):
-        screen.blit(self.image, (self.x, self.y))
-
-    def reset(self):
-        self.x = 370
-        self.y = 480
-        self.change_x = 0
-
-    def is_collision(self, ex, ey):
-        return math.sqrt((math.pow(self.x - ex, 2)) + (math.pow(self.y - ey, 2))) < 27
-
-
-class Bullet:
-    def __init__(self):
-        self.image = pygame.image.load("../Art/bullet.png")
-        self.x = 0
-        self.y = 480
-        self.change_y = 10
-        self.state = "ready"
-
-    def fire(self, player_x):
-        self.state = "fire"
-        self.x = player_x
-        self.y = 480
-
-    def update(self):
-        if self.state == "fire":
-            self.y -= self.change_y
-            if self.y <= 0:
-                self.reset()
-
-    def draw(self, screen):
-        if self.state == "fire":
-            screen.blit(self.image, (self.x + 16, self.y + 10))
-
-    def reset(self):
-        self.state = "ready"
-        self.y = 480
-
-    def is_collision(self, ex, ey):
-        return math.sqrt((math.pow(self.x - ex, 2)) + (math.pow(self.y - ey, 2))) < 27
-
-
-class EnemyManager:
-    def __init__(self):
-        self.rows = 5
-        self.cols = 10
-        self.initial_speed = 0.3
-        self.speed_increment = 0.1
-        self.current_speed = self.initial_speed
-        self.direction = 1
-        self.drop_rate = 8
-        self.reset()
-
-    def reset(self):
-        self.x = [50 + col * 70 for row in range(self.rows) for col in range(self.cols)]
-        self.y = [50 + row * 50 for row in range(self.rows) for col in range(self.cols)]
-        self.change_x = [self.initial_speed * self.direction for _ in range(self.rows * self.cols)]
-        self.active = [True] * (self.rows * self.cols)
-        self.current_speed = self.initial_speed
-
-    def update(self, bullet, player):
-        active_enemy_count = 0
-        reverse_direction = False
-
-        for i in range(len(self.x)):
-            if self.active[i]:
-                active_enemy_count += 1
-                self.x[i] += self.change_x[i] * self.direction
-
-                if self.x[i] <= 0 or self.x[i] >= 736:
-                    reverse_direction = True
-
-                if bullet.is_collision(self.x[i], self.y[i]):
-                    bullet.reset()
-                    self.active[i] = False
-
-                if player.is_collision(self.x[i], self.y[i]):
-                    player.game_over = True
-
-        if reverse_direction:
-            self.direction *= -1
-            for j in range(len(self.y)):
-                self.y[j] += self.drop_rate
-
-        if active_enemy_count < len(self.x):
-            self.current_speed = self.initial_speed + (len(self.x) - active_enemy_count) * self.speed_increment
-            for i in range(len(self.change_x)):
-                self.change_x[i] = self.current_speed
-
-    def draw(self, screen):
-        for i in range(len(self.x)):
-            if self.active[i]:
-                screen.blit(pygame.image.load("../Art/enemy.png"), (self.x[i], self.y[i]))
-
-    def all_inactive(self):
-        return all(not active for active in self.active)
 
 
 if __name__ == "__main__":
