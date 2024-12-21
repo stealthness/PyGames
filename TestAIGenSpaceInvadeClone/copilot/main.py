@@ -14,181 +14,200 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 
-# Create Screen
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("(Copilot) Space Invaders")
 
-# Load assets
-player_img = pygame.image.load("../Art/player.png")
-enemy_img = pygame.image.load("../Art/enemy.png")
-bullet_img = pygame.image.load("../Art/bullet.png")
+class Game:
+    def __init__(self):
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption("(Copilot) Space Invaders")
+        self.clock = pygame.time.Clock()
+        self.font = pygame.font.Font(None, 36)
+        self.running = True
+        self.game_over = False
+        self.score = 0
+        self.player = Player()
+        self.bullet = Bullet()
+        self.enemies = EnemyManager()
 
-# Game Variables
-player_x = 370
-player_y = 480
-player_x_change = 0
+    def run(self):
+        while self.running:
+            self.handle_events()
+            self.update()
+            self.draw()
+            self.clock.tick(60)
+        pygame.quit()
 
-rows = 5
-cols = 10
-enemy_x = []
-enemy_y = []
-enemy_x_change = []
-enemy_y_change = []
-enemy_active = []  # Track if enemies are active
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    self.player.change_x = -5
+                if event.key == pygame.K_RIGHT:
+                    self.player.change_x = 5
+                if event.key == pygame.K_SPACE and self.bullet.state == "ready":
+                    self.bullet.fire(self.player.x)
+                if event.key == pygame.K_r and self.game_over:
+                    self.reset_game()
+            if event.type == pygame.KEYUP:
+                if event.key in [pygame.K_LEFT, pygame.K_RIGHT]:
+                    self.player.change_x = 0
 
-initial_speed = 0.3  # Start slower
-speed_increment = 0.1
-current_speed = initial_speed
+    def update(self):
+        if not self.game_over:
+            self.player.update()
+            self.bullet.update()
+            self.enemies.update(self.bullet, self.player)
+            self.check_collisions()
+            if self.enemies.all_inactive():
+                self.enemies.reset()
+        else:
+            self.show_game_over()
 
-enemy_direction = 1  # Shared direction for all enemies
-enemy_drop_rate = 8  # Variable to adjust drop-down amount
+    def draw(self):
+        self.screen.fill(BLACK)
+        self.player.draw(self.screen)
+        self.bullet.draw(self.screen)
+        self.enemies.draw(self.screen)
+        self.show_score()
+        pygame.display.update()
 
-for row in range(rows):
-    for col in range(cols):
-        enemy_x.append(50 + col * 70)
-        enemy_y.append(50 + row * 50)
-        enemy_x_change.append(initial_speed * enemy_direction)
-        enemy_y_change.append(enemy_drop_rate)
-        enemy_active.append(True)
+    def check_collisions(self):
+        for i, (ex, ey, active) in enumerate(zip(self.enemies.x, self.enemies.y, self.enemies.active)):
+            if active and self.bullet.is_collision(ex, ey):
+                self.bullet.reset()
+                self.score += 1
+                self.enemies.active[i] = False
+            if active and self.player.is_collision(ex, ey):
+                self.game_over = True
 
-bullet_x = 0
-bullet_y = 480
-bullet_y_change = 10
-bullet_state = "ready"
+    def show_score(self):
+        score_text = self.font.render(f"Score: {self.score}", True, WHITE)
+        text_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, 20))
+        self.screen.blit(score_text, text_rect)
 
-score = 0
-font = pygame.font.Font(None, 36)
+    def show_game_over(self):
+        game_over_text = self.font.render("Game Over! Press R to Restart", True, RED)
+        self.screen.blit(game_over_text, (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 20))
 
-# Clock for controlling FPS
-clock = pygame.time.Clock()
+    def reset_game(self):
+        self.game_over = False
+        self.score = 0
+        self.player.reset()
+        self.bullet.reset()
+        self.enemies.reset()
 
-# Functions
-def player(x, y):
-    screen.blit(player_img, (x, y))
 
-def enemy(x, y, i):
-    screen.blit(enemy_img, (x, y))
+class Player:
+    def __init__(self):
+        self.image = pygame.image.load("../Art/player.png")
+        self.x = 370
+        self.y = 480
+        self.change_x = 0
 
-def fire_bullet(x, y):
-    global bullet_state
-    bullet_state = "fire"
-    screen.blit(bullet_img, (x + 16, y + 10))
+    def update(self):
+        self.x += self.change_x
+        self.x = max(0, min(SCREEN_WIDTH - 64, self.x))
 
-def is_collision(obj1_x, obj1_y, obj2_x, obj2_y, distance_threshold):
-    distance = math.sqrt((math.pow(obj1_x - obj2_x, 2)) + (math.pow(obj1_y - obj2_y, 2)))
-    return distance < distance_threshold
+    def draw(self, screen):
+        screen.blit(self.image, (self.x, self.y))
 
-def show_score():
-    score_text = font.render(f"Score: {score}", True, WHITE)
-    text_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, 20))
-    screen.blit(score_text, text_rect)
+    def reset(self):
+        self.x = 370
+        self.y = 480
+        self.change_x = 0
 
-def show_game_over():
-    game_over_text = font.render("Game Over! Press R to Restart", True, RED)
-    screen.blit(game_over_text, (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 20))
+    def is_collision(self, ex, ey):
+        return math.sqrt((math.pow(self.x - ex, 2)) + (math.pow(self.y - ey, 2))) < 27
 
-def reset_enemies():
-    global enemy_x, enemy_y, enemy_active, current_speed, enemy_x_change
-    enemy_x = [50 + col * 70 for row in range(rows) for col in range(cols)]
-    enemy_y = [50 + row * 50 for row in range(rows) for col in range(cols)]
-    enemy_active = [True] * (rows * cols)
-    current_speed = initial_speed
-    enemy_x_change = [initial_speed * enemy_direction for _ in range(rows * cols)]
 
-# Game Loop
-running = True
-game_over = False
-while running:
-    screen.fill(BLACK)
+class Bullet:
+    def __init__(self):
+        self.image = pygame.image.load("../Art/bullet.png")
+        self.x = 0
+        self.y = 480
+        self.change_y = 10
+        self.state = "ready"
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    def fire(self, player_x):
+        self.state = "fire"
+        self.x = player_x
+        self.y = 480
 
-        # Keypresses
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                player_x_change = -5
-            if event.key == pygame.K_RIGHT:
-                player_x_change = 5
-            if event.key == pygame.K_SPACE:
-                if bullet_state == "ready":
-                    bullet_x = player_x
-                    fire_bullet(bullet_x, bullet_y)
-            if event.key == pygame.K_r and game_over:
-                # Restart the game
-                game_over = False
-                score = 0
-                player_x = 370
-                player_y = 480
-                bullet_y = 480
-                bullet_state = "ready"
-                reset_enemies()
+    def update(self):
+        if self.state == "fire":
+            self.y -= self.change_y
+            if self.y <= 0:
+                self.reset()
 
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                player_x_change = 0
+    def draw(self, screen):
+        if self.state == "fire":
+            screen.blit(self.image, (self.x + 16, self.y + 10))
 
-    if not game_over:
-        # Player Movement
-        player_x += player_x_change
-        player_x = max(0, min(SCREEN_WIDTH - 64, player_x))
+    def reset(self):
+        self.state = "ready"
+        self.y = 480
 
-        # Enemy Movement
+    def is_collision(self, ex, ey):
+        return math.sqrt((math.pow(self.x - ex, 2)) + (math.pow(self.y - ey, 2))) < 27
+
+
+class EnemyManager:
+    def __init__(self):
+        self.rows = 5
+        self.cols = 10
+        self.initial_speed = 0.3
+        self.speed_increment = 0.1
+        self.current_speed = self.initial_speed
+        self.direction = 1
+        self.drop_rate = 8
+        self.reset()
+
+    def reset(self):
+        self.x = [50 + col * 70 for row in range(self.rows) for col in range(self.cols)]
+        self.y = [50 + row * 50 for row in range(self.rows) for col in range(self.cols)]
+        self.change_x = [self.initial_speed * self.direction for _ in range(self.rows * self.cols)]
+        self.active = [True] * (self.rows * self.cols)
+        self.current_speed = self.initial_speed
+
+    def update(self, bullet, player):
         active_enemy_count = 0
         reverse_direction = False
 
-        for i in range(len(enemy_x)):
-            if enemy_active[i]:  # Only update active enemies
+        for i in range(len(self.x)):
+            if self.active[i]:
                 active_enemy_count += 1
-                enemy_x[i] += enemy_x_change[i] * enemy_direction
+                self.x[i] += self.change_x[i] * self.direction
 
-                if enemy_x[i] <= 0 or enemy_x[i] >= 736:
+                if self.x[i] <= 0 or self.x[i] >= 736:
                     reverse_direction = True
 
-                # Collision with bullet
-                if is_collision(enemy_x[i], enemy_y[i], bullet_x, bullet_y, 27):
-                    bullet_y = 480
-                    bullet_state = "ready"
-                    score += 1
-                    enemy_active[i] = False  # Deactivate the enemy
+                if bullet.is_collision(self.x[i], self.y[i]):
+                    bullet.reset()
+                    self.active[i] = False
 
-                # Collision with player
-                if is_collision(enemy_x[i], enemy_y[i], player_x, player_y, 27):
-                    game_over = True
-
-                enemy(enemy_x[i], enemy_y[i], i)
+                if player.is_collision(self.x[i], self.y[i]):
+                    player.game_over = True
 
         if reverse_direction:
-            enemy_direction *= -1
-            for j in range(len(enemy_y)):
-                enemy_y[j] += enemy_drop_rate  # Use adjustable drop rate
+            self.direction *= -1
+            for j in range(len(self.y)):
+                self.y[j] += self.drop_rate
 
-        # Increase speed as enemies are killed
-        if active_enemy_count < len(enemy_x):
-            current_speed = initial_speed + (len(enemy_x) - active_enemy_count) * speed_increment
-            for i in range(len(enemy_x_change)):
-                enemy_x_change[i] = current_speed
+        if active_enemy_count < len(self.x):
+            self.current_speed = self.initial_speed + (len(self.x) - active_enemy_count) * self.speed_increment
+            for i in range(len(self.change_x)):
+                self.change_x[i] = self.current_speed
 
-        # Check if all enemies are inactive
-        if active_enemy_count == 0:
-            reset_enemies()
+    def draw(self, screen):
+        for i in range(len(self.x)):
+            if self.active[i]:
+                screen.blit(pygame.image.load("../Art/enemy.png"), (self.x[i], self.y[i]))
 
-        # Bullet Movement
-        if bullet_state == "fire":
-            fire_bullet(bullet_x, bullet_y)
-            bullet_y -= bullet_y_change
+    def all_inactive(self):
+        return all(not active for active in self.active)
 
-        if bullet_y <= 0:
-            bullet_y = 480
-            bullet_state = "ready"
 
-        player(player_x, player_y)
-        show_score()
-    else:
-        show_game_over()
-
-    pygame.display.update()
-    clock.tick(60)
-
-pygame.quit()
+if __name__ == "__main__":
+    game = Game()
+    game.run()
