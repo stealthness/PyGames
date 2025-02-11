@@ -19,6 +19,8 @@ class Game:
         self.running = True
         while self.running:
             self.screen.fill((0, 0, 0))
+            self.handle_events()
+            self.update()
             pygame.display.flip()
             self.clock.tick(60)
         pygame.quit()
@@ -36,6 +38,11 @@ class Game:
                     self.keys[2] = True
                 if event.key == pygame.K_DOWN:
                     self.keys[3] = True
+
+    def update(self):
+        self.player.move(self.keys)
+        self.player.update()
+
 
 if __name__ == "__main__":
     game = Game()
