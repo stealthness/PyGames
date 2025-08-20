@@ -11,18 +11,31 @@ SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Simple Shooter Game')
 
+'''
+This class represents the game scene, which contains all the game objects.
+It manages the enemies and updates their states.
+'''
 class Scene:
     def __init__(self):
         self.enemies = []
 
+    '''
+    Adds an enemy to the scene.
+    :param enemy: An instance of Solder or any other enemy class.
+    '''
     def add_enemy(self, enemy):
         self.enemies.append(enemy)
 
+    '''
+    Updates the scene by drawing all items in scene.
+    '''
     def update(self):
         for enemy in self.enemies:
             enemy.draw(screen)
 
-
+'''
+Initializes the game scene with player and enemy instances.
+'''
 def init(scene):
 
     player = Solder(100, 100, 2)
@@ -30,12 +43,16 @@ def init(scene):
     scene.add_enemy(player)
     scene.add_enemy(enemy)
 
+'''
+The main game loop that handles events, updates the scene, 
+and draws everything on the screen.
+'''
 def run():
     is_running = True
     scene = Scene()
     init(scene)
 
-    dir = Vector2(0, 0)
+    _dir = Vector2(0, 0)
 
     while is_running:
         for event in pygame.event.get():
@@ -45,19 +62,19 @@ def run():
                 if event.key == pygame.K_q:
                     is_running = False
                 if event.key == pygame.K_a:
-                    dir.x = -1
+                    _dir.x = -1
                 if event.key == pygame.K_d:
-                    dir.x = 1
+                    _dir.x = 1
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_a:
-                    dir.x = 0
+                    _dir.x = 0
                 if event.key == pygame.K_d:
-                    dir.x = 0
+                    _dir.x = 0
 
         draw_background()
 
-        scene.enemies[0].move(dir)
+        scene.enemies[0].move(_dir)
 
         for enemy in scene.enemies:
             enemy.draw(screen)
@@ -66,7 +83,9 @@ def run():
         pygame.display.update()
         pygame.time.Clock().tick(60)
 
-
+'''
+Draws the background of the game screen.
+'''
 def draw_background():
     screen.fill((255, 255, 255))
 

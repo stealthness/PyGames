@@ -18,20 +18,18 @@ class GameObject:
 
     def update(self) -> bool:
         if self.debugMode:
-            print(f'GO update:{self}')
+            print(f'<1> update:{self}')
         if not self.active:
-            print(f'{self.name} not active: {self.active}')
             return False
         self.move(self.dx, self.dy)
         return True
 
     def move(self, dx, dy):
-        if self.debugMode:
-            print(f'GO(0) move: {self}, dx:{dx}, dy:{dy}')
         if self.active:
             self.x += dx
             self.y += dy
-        print(f'GO(1) move: {self}, dx:{dx}, dy:{dy}')
+        if self.debugMode:
+            print(f'<2> moved to: {self}, dx:{dx}, dy:{dy}')
 
     def reset(self):
         self.x = self.init_x

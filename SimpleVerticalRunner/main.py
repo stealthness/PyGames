@@ -14,9 +14,10 @@ WINDOW_HEIGHT = 600
 PLAYER_WIDTH = 20
 player = Player()
 
-rocks = [Rock() for i in range(5)]
+rocks = []
 rock1 = Rock(dy=5)
 rock1.dy = 5
+rocks.append(rock1)
 RockManager = RockManager()
 
 # Create the game window
@@ -71,7 +72,10 @@ while isRunning:
     for rock in rocks:
         rock.update()
         rock.draw(screen)
-    RockManager.update()
+    r = RockManager.update()
+    if r is not None:
+        rocks.append(r)
+
     # Update the display
 
     # check for collision

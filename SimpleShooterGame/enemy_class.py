@@ -12,7 +12,7 @@ class Solder(pygame.sprite.Sprite):
         self.default_image = self.animator.get_image_at(0)
         self.rect = self.default_image.get_rect()
         self.default_image = pygame.transform.scale(self.default_image,(int(self.rect.width * self.scale), int(self.rect.height * self.scale)))
-        self.rect.topleft = (x, y)
+        self.rect.top_left = (x, y)
         self.image = self.speed = speed
         self.dir = pygame.Vector2(0, 0)
         self.is_flip_x = True
