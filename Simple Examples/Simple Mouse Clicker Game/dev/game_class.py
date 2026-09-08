@@ -1,12 +1,15 @@
 
 import pygame
-from menu_manager_class import MenuManager
+from menu_manager_class import MenuManager, MenuAction
+
+
 class Game:
 
     def __init__(self, _screen):
         self.screen = _screen
         self.state = GameState.Menu
-        self.background_color = (0, 0, 0)
+        self.background_color = (20, 20, 20)
+        self.update_background()
         self.menu = MenuManager(self.screen)
         
     def handle_events(self):
@@ -43,10 +46,10 @@ class Game:
 
             # menu returns "play" or "quit" (or None). If quit -> stop,
             # otherwise keep running (Play or None both continue)
-            if result == "quit":
+            if result == MenuAction.QuitAction:
                 action = False
             else:
-                if result == "play":
+                if result == MenuAction.PlayAction:
                     self.state = GameState.Playing
                     self.update_background()
                 action = True

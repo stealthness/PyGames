@@ -1,4 +1,11 @@
+from enum import Enum
+
 import pygame
+
+class MenuAction (Enum):
+    PlayAction = "Play"
+    QuitAction = "Quit"
+
 
 class MenuManager:
     """
@@ -53,14 +60,12 @@ class MenuManager:
         """
         for event in pygame.event.get():
         
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-    
-                    if self.play_button.collidepoint(event.pos):
-                        return "play"
-    
-                    if self.quit_button.collidepoint(event.pos):
-                        return "quit"
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.play_button.collidepoint(event.pos):
+                    return MenuAction.PlayAction
+
+                if self.quit_button.collidepoint(event.pos):
+                    return MenuAction.QuitAction
 
         return None
 
