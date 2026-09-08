@@ -40,7 +40,8 @@ class Game:
         action = True
         if self.state == GameState.Menu:
             # let the menu handle its own input
-            result = self.menu.handle_event()
+               
+            result = self.menu.handle_event(pygame.event.get())
             # draw the menu every frame
             self.menu.draw()
 

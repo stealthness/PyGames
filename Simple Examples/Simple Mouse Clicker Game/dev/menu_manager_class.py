@@ -51,14 +51,15 @@ class MenuManager:
             button_height,
         )
 
-    def handle_event(self):
+    def handle_event(self, events : list) -> MenuAction | None:
         """
         Handle menu button clicks.
-
+        Args:
+            list of events from pygame event.
         Returns:
-            str | None: "play", "quit", or None.
+            MenuAction or None.
         """
-        for event in pygame.event.get():
+        for event in events:
         
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.play_button.collidepoint(event.pos):
