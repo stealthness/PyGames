@@ -23,7 +23,10 @@ class MenuManager:
         self.screen = screen
         self.screen_rect = screen.get_rect()
 
+        # cwd  = "Simple Examples/Simple Mouse Clicker Game/dev/" for PyCharm build
         cwd = os.path.join(os.getcwd(), "Simple Examples", "Simple Mouse Clicker Game", "dev")
+        # cwd = '' required for pygbag archive build
+        #cwd = ''
         font_path = os.path.join(cwd, 'Fonts', 'Montserrat-Bold.ttf')
         
         # Fonts
