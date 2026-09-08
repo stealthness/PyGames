@@ -1,6 +1,6 @@
 
 import pygame
-from menu_manager_class import MenuManager, MenuAction
+from menu_manager import MenuManager, MenuAction
 
 
 class Game:
@@ -12,14 +12,13 @@ class Game:
         self.update_background()
         self.menu = MenuManager(self.screen)
         
-    def handle_events(self):
+    def handle_events(self, events):
         """
         Handle events, return False if need to exit the application, True otherwise
         :return True if game continues, or False if the Game is to exit application
         """
-        
-        for event in pygame.event.get():
-        
+
+        for event in events:
             if event.type == pygame.QUIT:
                 return False
         
@@ -29,15 +28,31 @@ class Game:
                 if event.key == pygame.K_SPACE:
                     self.state = GameState((self.state.value + 1) % 4)
                     self.update_background()
+                if event.key == pygame.K_p:
+                    # Key p toggles between paused and playing states
+                    if self.state == GameState.Paused:
+                        self.state = GameState.Playing
+                    elif self.state == GameState.Playing:
+                        self.state = GameState.Paused
+                    self.update_background()
                     
         return True
 
-    def update(self, dt):
+    def update(self, dt: int) -> bool:
+        """
+        Handles the update of the game
+        :param dt: int, Delta Time
+        :rtype: bool, True if game  is running, false otherwise
+        """
         #set background
         # fill the background each frame so old frames are cleared
         self.screen.fill(self.background_color)
         
         action = True
+        
+        # ---------------------------------
+        # Game state = Menu
+        # ---------------------------------
         if self.state == GameState.Menu:
             # let the menu handle its own input
                
@@ -54,8 +69,14 @@ class Game:
                     self.state = GameState.Playing
                     self.update_background()
                 action = True
+
+        # ---------------------------------
+        # Game state = Playing
+        # ---------------------------------
+        elif self.state == GameState.Playing:
+            action = self.handle_events(pygame.event.get())
         else:
-            action = self.handle_events()
+            action = self.handle_events(pygame.event.get())
 
         
 

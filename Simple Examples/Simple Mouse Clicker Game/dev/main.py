@@ -1,6 +1,6 @@
 import asyncio
 import pygame
-from game_class import Game
+from game import Game
 
 # --------------------------------------------------
 # Configuration
