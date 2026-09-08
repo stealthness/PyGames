@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 
 import pygame
@@ -22,10 +23,13 @@ class MenuManager:
         self.screen = screen
         self.screen_rect = screen.get_rect()
 
+        cwd = os.path.join(os.getcwd(), "Simple Examples", "Simple Mouse Clicker Game", "dev")
+        font_path = os.path.join(cwd, 'Fonts', 'Montserrat-Bold.ttf')
+        
         # Fonts
-        self.title_font = pygame.font.Font(None, 36)
-        self.description_font = pygame.font.Font(None, 24)
-        self.button_font = pygame.font.Font(None, 36)
+        self.title_font = pygame.font.Font(font_path, 24)
+        self.description_font = pygame.font.Font(font_path, 13)
+        self.button_font = pygame.font.Font(font_path, 36)
 
         # Text
         self.title = "Simple\nMouse\nClicker\nGame"
@@ -145,7 +149,7 @@ class MenuManager:
     def draw_instructions(self) -> None:
         """
         Draw the instructions.
-        :return: None
+        :rtype: None
         """
         description_surface = self.description_font.render(
             self.description,
@@ -154,7 +158,7 @@ class MenuManager:
         )
 
         description_rect = description_surface.get_rect(
-            center=(self.screen_rect.centerx, 180)
+            center=(self.screen_rect.centerx, 250)
         )
 
         self.screen.blit(
@@ -165,7 +169,7 @@ class MenuManager:
     def draw_title(self) -> None:
         """
         Draw the title.
-        :return: None
+        :rtype: None
         """
         title_surface = self.title_font.render(
             self.title,
