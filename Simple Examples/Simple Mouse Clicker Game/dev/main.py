@@ -32,6 +32,10 @@ clock = pygame.time.Clock()
 # --------------------------------------------------
 
 async def main():
+    """
+    This is the main Game loop. The method is asynchronous so that it can be compiled with pygbag
+    """    
+    
     running = True
     
     game = Game(screen)

@@ -23,17 +23,17 @@ class MenuManager:
         self.screen_rect = screen.get_rect()
 
         # Fonts
-        self.title_font = pygame.font.Font(None, 72)
-        self.description_font = pygame.font.Font(None, 32)
-        self.button_font = pygame.font.Font(None, 40)
+        self.title_font = pygame.font.Font(None, 36)
+        self.description_font = pygame.font.Font(None, 24)
+        self.button_font = pygame.font.Font(None, 36)
 
         # Text
-        self.title = "My Game"
-        self.description = "Press Play to start the game."
+        self.title = "Simple\nMouse\nClicker\nGame"
+        self.description = "Instructions\nClick on the targets"
 
         # Buttons
-        button_width = 200
-        button_height = 60
+        button_width = 150
+        button_height = 50
 
         center_x = self.screen_rect.centerx - button_width // 2
 
@@ -70,7 +70,7 @@ class MenuManager:
 
         return None
 
-    def draw_button(self, rect, text):
+    def draw_button(self, rect, text : str) -> None:
         """
         Draw a menu button.
         """
@@ -119,22 +119,34 @@ class MenuManager:
         """
 
         # Title
-        title_surface = self.title_font.render(
-            self.title,
-            True,
-            (255, 255, 255),
+        self.draw_title()
+
+        # Instructions
+        self.draw_instructions()
+
+        # Buttons
+        self.draw_buttons()
+
+    def draw_buttons(self):
+        """
+        Draw the button interactions.
+        :return: 
+        """
+        self.draw_button(
+            self.play_button,
+            "Play",
         )
 
-        title_rect = title_surface.get_rect(
-            center=(self.screen_rect.centerx, 100)
+        self.draw_button(
+            self.quit_button,
+            "Quit",
         )
 
-        self.screen.blit(
-            title_surface,
-            title_rect,
-        )
-
-        # Description
+    def draw_instructions(self) -> None:
+        """
+        Draw the instructions.
+        :return: None
+        """
         description_surface = self.description_font.render(
             self.description,
             True,
@@ -150,13 +162,22 @@ class MenuManager:
             description_rect,
         )
 
-        # Buttons
-        self.draw_button(
-            self.play_button,
-            "Play",
+    def draw_title(self) -> None:
+        """
+        Draw the title.
+        :return: None
+        """
+        title_surface = self.title_font.render(
+            self.title,
+            True,
+            (255, 255, 255),
         )
 
-        self.draw_button(
-            self.quit_button,
-            "Quit",
+        title_rect = title_surface.get_rect(
+            center=(self.screen_rect.centerx, 100)
+        )
+
+        self.screen.blit(
+            title_surface,
+            title_rect,
         )
