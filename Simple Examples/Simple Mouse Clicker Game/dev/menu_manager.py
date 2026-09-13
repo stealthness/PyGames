@@ -23,11 +23,12 @@ class MenuManager:
         self.screen = screen
         self.screen_rect = screen.get_rect()
 
-        # cwd  = "Simple Examples/Simple Mouse Clicker Game/dev/" for PyCharm windows build
-        # cwd = os.path.join(os.getcwd(), "Simple Examples", "Simple Mouse Clicker Game", "dev")
+        
+        # cwd  = "Game Jams/[Trijam 389] Find the sheep/Font" # for PyCharm windows build
+        cwd = os.path.join(os.getcwd(), "Game Jams", "[Trijam 389] Find the sheep")
         # cwd = '' required for pygbag archive build
-        cwd = ''  # use for macos
-        font_path = os.path.join(cwd, 'Fonts', 'Montserrat-Bold.ttf')
+        # cwd = ''  # use for macos
+        font_path = os.path.join(cwd, 'Font', 'Montserrat-Bold.ttf')
         
         # Fonts
         self.title_font = pygame.font.Font(font_path, 24)
