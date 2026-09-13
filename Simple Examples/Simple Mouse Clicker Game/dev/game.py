@@ -1,6 +1,7 @@
 
 import pygame
 from menu_manager import MenuManager, MenuAction
+from TargetGenerator import TargetGenerator
 
 
 class Game:
@@ -11,6 +12,7 @@ class Game:
         self.background_color = (20, 20, 20)
         self.update_background()
         self.menu = MenuManager(self.screen)
+        self.target_gen = TargetGenerator(self.screen)
         
     def handle_events(self, events):
         """
@@ -47,7 +49,6 @@ class Game:
         #set background
         # fill the background each frame so old frames are cleared
         self.screen.fill(self.background_color)
-        
         action = True
         
         # ---------------------------------
@@ -73,8 +74,13 @@ class Game:
         # ---------------------------------
         # Game state = Playing
         # ---------------------------------
-        elif self.state == GameState.Playing:
+        if self.state == GameState.Playing:
+
             action = self.handle_events(pygame.event.get())
+            if not self.target_gen.has_started():
+                self.target_gen.start()
+            for target in self.target_gen.get_targets():
+                target.update(dt)
         else:
             action = self.handle_events(pygame.event.get())
 
