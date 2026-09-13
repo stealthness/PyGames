@@ -53,9 +53,10 @@ running = True
 # Async Game Loop
 # --------------------------------------------------
 
-def init_game():
+def init_game(level):
+    flock.clear()
     # create sheep
-    for i in range(5):
+    for i in range(level + 5):
         pos = get_random_sheep_pos()
         flock.append(Sheep(pos))
         
@@ -70,17 +71,21 @@ def get_random_sheep_pos():
         
 async def main():
     global running
-    
+    level = 1
     GAME_OVER = False
             
     print(f" flock {len(flock)}")
     
-    init_game()
-    
+    init_game(level)
+    score = 0
     # start countdown timer
     start_ticks = pygame.time.get_ticks()
 
     while running:
+
+        # Draw the background
+        screen.blit(background, (0, 0))
+        
         
         for event in pygame.event.get():
 
@@ -94,18 +99,31 @@ async def main():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
                 for sheep in flock:
-                    sheep.handle_click(pos)
+                    score += sheep.handle_click(pos)
+
         
+        menuManager.draw_score(score)
         
-        # Draw the background
-        screen.blit(background, (0, 0))
         if TEST_MODE:
             pass
     
         for sheep in flock:
             sheep.draw(screen)
         
-        if GAME_OVER:
+        
+        # Check if all sheep are found
+        all_found = all(sheep.isFound for sheep in flock)
+        if all_found and not GAME_OVER:
+            GAME_OVER = True
+            menuManager.show_end_screen(f"Level {level} Complete!")
+            pygame.display.flip()
+            await asyncio.sleep(2)
+            
+            # Advance to next level
+            level += 1
+            GAME_OVER = False
+            init_game(level)
+            start_ticks = pygame.time.get_ticks()
             continue
         
         # Draw countdown timer at top center
