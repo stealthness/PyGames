@@ -48,8 +48,16 @@ running = True
 def init_game():
     # create sheep
     for i in range(5):
-        pos = (randrange(900), randrange(500))
+        pos = get_random_sheep_pos()
         flock.append(Sheep(pos))
+        
+def get_random_sheep_pos():
+    while True:
+        pos = randrange(WIDTH), randrange(HEIGHT)
+        if 400 < pos[0] < 500 and 100 < pos[1] < 300:
+            continue
+        else:
+            return pos
         
         
 async def main():
