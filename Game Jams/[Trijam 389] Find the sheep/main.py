@@ -3,8 +3,10 @@ import os
 from random import randrange
 
 import pygame
+from pygame.examples.music_drop_fade import music_file_list
 
 from menuManager import MenuManager
+from musicManager import MusicManager   
 from sheep import Sheep
 
 # --------------------------------------------------
@@ -17,6 +19,7 @@ BASE_DIR : str = os.path.dirname(__file__)
 #BASE_DIR : str = "" # pygbag
 background_path = os.path.join(BASE_DIR, "Art", "background.png")
 background = pygame.image.load(background_path)
+music_path = os.path.join(BASE_DIR, "Hidden", "geoffharvey-farmyard-fun-374610.mp3")
 HEIGHT = 540
 FPS = 60
 TEST_MODE = True
@@ -44,6 +47,7 @@ active_boxes = []
 flock = []
 
 menuManager = MenuManager(screen)
+musicManager = MusicManager(music_path)
 # --------------------------------------------------
 # Game State
 # --------------------------------------------------
@@ -55,15 +59,16 @@ running = True
 # --------------------------------------------------
 
 def init_game(level):
+    musicManager.play_music()
     flock.clear()
     # create sheep
-    for i in range(level + 5):
+    for i in range((level -1) * 3 + 5):
         pos = get_random_sheep_pos()
         flock.append(Sheep(pos))
         
 def get_random_sheep_pos():
     while True:
-        pos = randrange(WIDTH), randrange(HEIGHT)
+        pos = randrange((WIDTH - 40)), randrange((HEIGHT-40))
         if 400 < pos[0] < 500 and 100 < pos[1] < 300:
             continue
         else:
@@ -74,8 +79,7 @@ async def main():
     global running
     level = 1
     GAME_OVER = False
-            
-    print(f" flock {len(flock)}")
+    
     
     init_game(level)
     score = 0
@@ -117,6 +121,7 @@ async def main():
         if all_found and not GAME_OVER:
             GAME_OVER = False
             menuManager.show_end_level(score, level)
+            musicManager.stop_music()
             pygame.display.flip()
             await asyncio.sleep(3)
             
@@ -134,6 +139,7 @@ async def main():
         if remaining <= 0:
             GAME_OVER = True
             menuManager.show_end_screen(score)
+            musicManager.stop_music()
             pygame.display.flip()
             await asyncio.sleep(10)
 
