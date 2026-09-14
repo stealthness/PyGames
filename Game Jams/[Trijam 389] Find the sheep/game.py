@@ -64,8 +64,8 @@ class Game:
     def update_sick_sheep(self):
         """Apply sickness and death to sheep on timer."""
         current_ticks = pygame.time.get_ticks()
-        if current_ticks - self.start_ticks > self.next_sick_timer:
-            # Reset timer
+        if current_ticks >= self.next_sick_timer:
+            # Set next timer: current time + random delay
             self.next_sick_timer = current_ticks + self.next_sick_delay
             
             # Find active (not found, not dead) sheep

@@ -11,7 +11,7 @@ class MenuAction (Enum):
 
 class MenuManager:
     """
-    Manages the main menu display and button interactions.
+    Manages the main menu display and button interactions. and updates the gameUI
     """
 
    
@@ -31,7 +31,7 @@ class MenuManager:
         font_path = os.path.join(cwd, 'Font', 'Montserrat-Bold.ttf')
         
         # Fonts
-        self.title_font = pygame.font.Font(font_path, 24)
+        self.title_font = pygame.font.Font(font_path, 50)
         self.description_font = pygame.font.Font(font_path, 13)
         self.button_font = pygame.font.Font(font_path, 36)
 
