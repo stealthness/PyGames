@@ -12,8 +12,10 @@ class MusicManager:
         self.is_toggled_on = True
         
         
+        
     def load_music(self):
         pygame.mixer.music.load(self.music)
+        pygame.mixer.init(44100, -16, 2, 2048)
         
         
     def play_music(self):
