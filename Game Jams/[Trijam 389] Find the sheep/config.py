@@ -5,7 +5,7 @@ FPS = 60
 TITLE = "Find the Sheep"
 
 # Game Parameters
-TIMER_SECONDS = 4
+TIMER_SECONDS = 30
 MAX_STRIKES = 3
 STARTING_SHEEP_COUNT = 5
 DIFFICULTY_SCALING = 3  # sheep per level

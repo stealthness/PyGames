@@ -1,3 +1,5 @@
+from typing import Self
+
 import pygame
 
 class MenuConfig:
@@ -91,32 +93,25 @@ class MenuManager:
     """
         self.screen.fill((223, 237, 149))
         # Draw two lines: title and score
-        title_text = f"Find the Sheep"
-        descr_text = f"Your  job is to find all the lost sheep\nWatchout for sick sheep\nPress space to start"
-        title_surf = self.font.render(title_text, True, MenuConfig.BLACK)
-        score_surf = self.font.render(descr_text, True, MenuConfig.BLACK)
-        center_x = self.width // 2
-        center_y = self.height // 2
-        title_rect = title_surf.get_rect(center=(center_x, center_y -200))
-        score_rect = score_surf.get_rect(center=(center_x, center_y + 20))
-        self.screen.blit(title_surf, title_rect)
-        self.screen.blit(score_surf, score_rect)
-        # 
-        # Draw a Start button below the text
-        btn_w, btn_h = 220, 48
-        btn_x = center_x - btn_w // 2
-        btn_y = center_y + 150
-        btn_rect = pygame.Rect(btn_x, btn_y, btn_w, btn_h)
-        # button background
-        pygame.draw.rect(self.screen, (30, 144, 255), btn_rect, border_radius=8)
-        # button border
-        pygame.draw.rect(self.screen, (0,0,0), btn_rect, width=2, border_radius=8)
-        # button text
-        btn_font = pygame.font.SysFont("Arial", 22)
-        btn_surf = btn_font.render("Start", True, (0,0,0))
-        btn_text_rect = btn_surf.get_rect(center=btn_rect.center)
-        self.screen.blit(btn_surf, btn_text_rect)   
-        
+        MenuManager.create_text_at(self.screen,
+                                   f"Find the Sheep",
+                                   self.font,
+                                   (0, 120),
+                                   50)
+
+
+        MenuManager.create_text_at(self.screen,
+                                   f"Your  job is to find all the lost sheep\nWatchout for sick sheep\nPress space to start",
+                                   self.font,
+                                   (0, 0),
+                                   20)
+
+
+        btn_rect = MenuManager.create_btn_at(self.screen,
+                                             "continue",
+                                             self.font,
+                                             (0, -120),
+                                             30)
         return btn_rect
     
     @staticmethod
@@ -124,3 +119,41 @@ class MenuManager:
         mins = int(remaining) // 60
         secs = int(remaining) % 60
         return f"{mins}:{secs:02d}"
+    
+    @staticmethod
+    def create_text_at(screen,
+                       text, 
+                       font,
+                       position:tuple,
+                       font_size = 20):
+        text_surf = font.render(text, True, MenuConfig.BLACK)
+        center_x = screen.get_rect().centerx
+        center_y = screen.get_rect().centery
+        text_rect = text_surf.get_rect(center=(center_x - position[0], center_y -position[1] ))
+        screen.blit(text_surf, text_rect)
+        
+    
+    @staticmethod
+    def create_btn_at(screen,
+                      text,
+                      font,
+                      position,
+                      font_size = 20
+                      ):
+        center_x = screen.get_rect().centerx
+        center_y = screen.get_rect().centery
+        # Draw a Start button below the text
+        btn_w, btn_h = 220, 48
+        btn_x = center_x - btn_w // 2
+        btn_y = center_y + 150
+        btn_rect = pygame.Rect(btn_x, btn_y, btn_w, btn_h)
+        # button background
+        pygame.draw.rect(screen, (30, 144, 255), btn_rect, border_radius=8)
+        # button border
+        pygame.draw.rect(screen, (0,0,0), btn_rect, width=2, border_radius=8)
+        # button text
+        btn_font = pygame.font.SysFont("Arial", 22)
+        btn_surf = btn_font.render("Start", True, (0,0,0))
+        btn_text_rect = btn_surf.get_rect(center=btn_rect.center)
+        screen.blit(btn_surf, btn_text_rect) 
+        return btn_rect
