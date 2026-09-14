@@ -1,5 +1,6 @@
 import os
 from random import randint
+from path_utils import get_base_dir
 
 import pygame
 
@@ -50,7 +51,7 @@ class Sheep:
         if image_path is None:
             random_sheep = randint(1, 3)
             # prefer actual asset names (capitalization matches files)
-            BASE_DIR = os.path.dirname(__file__)  # windows
+            BASE_DIR = get_base_dir()
             # image and sick image use different files in the Art folder
             image_path = os.path.join(BASE_DIR, "Art", f"Sheep{random_sheep}.png")
             sick_image_path = os.path.join(BASE_DIR, "Art", f"SickSheep{random_sheep}.png")

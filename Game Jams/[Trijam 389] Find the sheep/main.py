@@ -8,6 +8,7 @@ from pygame.examples.music_drop_fade import music_file_list
 from menuManager import MenuManager
 from musicManager import MusicManager   
 from sheep import Sheep
+from path_utils import get_base_dir
 
 # --------------------------------------------------
 # Configuration
@@ -15,11 +16,11 @@ from sheep import Sheep
 
 WIDTH = 960  # Window width
 # Load the background image (path relative to this script)
-BASE_DIR : str = os.path.dirname(__file__)
-#BASE_DIR : str = "" # pygbag
+# BASE_DIR : str = get_base_dir()
+BASE_DIR : str = "" # pygbag
 background_path = os.path.join(BASE_DIR, "Art", "background.png")
 background = pygame.image.load(background_path)
-music_path = os.path.join(BASE_DIR, "Hidden", "geoffharvey-farmyard-fun-374610.mp3")
+music_path = os.path.join(BASE_DIR, "Hidden", "geoffharvey-farmyard-fun-374610.ogg")
 HEIGHT = 540
 FPS = 60
 TEST_MODE = True
@@ -58,6 +59,7 @@ running = True
 # Async Game Loop
 # --------------------------------------------------
 
+
 def init_game(level):
     musicManager.play_music()
     flock.clear()
@@ -65,6 +67,8 @@ def init_game(level):
     for i in range((level -1) * 3 + 5):
         pos = get_random_sheep_pos()
         flock.append(Sheep(pos, blaa_sounds=["Hidden/blaa1.ogg", "Hidden/blaa2.ogg", "Hidden/blaa3.ogg"]))
+    
+    
         
 def get_random_sheep_pos():
     while True:
@@ -116,7 +120,16 @@ async def main():
     
         if pygame.time.get_ticks() - start_ticks > next_sick_timer:
             next_sick_timer = pygame.time.get_ticks() +  NEXT_SICK_SHEEP_DELAY
-            flock[randint(0, len(flock) - 1)].make_sick()
+            lost_sheep_not_sick = []
+            for sheep in flock:
+                if sheep.isFound:
+                    continue
+                if sheep.isSick:
+                    continue
+                lost_sheep_not_sick.append(sheep)
+            
+            if len(lost_sheep_not_sick) > 1:
+                lost_sheep_not_sick[randint(0, len(lost_sheep_not_sick) - 1)].make_sick()
     
     
         for sheep in flock:
@@ -161,8 +174,11 @@ async def main():
             # Advance to next level
             if not running:
                 break
+            # increase the level
             level += 1
+            # reset the level
             init_game(level)
+            # Reset the sick timers
             start_ticks = pygame.time.get_ticks()
             next_sick_timer = start_ticks + NEXT_SICK_SHEEP_DELAY
             continue
