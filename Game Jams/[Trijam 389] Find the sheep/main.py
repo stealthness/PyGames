@@ -3,7 +3,6 @@ import os
 from random import randrange, randint
 
 import pygame
-from pygame.examples.music_drop_fade import music_file_list
 
 from menuManager import MenuManager
 from musicManager import MusicManager   
@@ -16,15 +15,14 @@ from path_utils import get_base_dir
 
 WIDTH = 960  # Window width
 # Load the background image (path relative to this script)
-# BASE_DIR : str = get_base_dir()
-BASE_DIR : str = "" # pygbag
+BASE_DIR : str = get_base_dir(True)
 background_path = os.path.join(BASE_DIR, "Art", "background.png")
 background = pygame.image.load(background_path)
 music_path = os.path.join(BASE_DIR, "Hidden", "geoffharvey-farmyard-fun-374610.ogg")
 HEIGHT = 540
 FPS = 60
 TEST_MODE = True
-TITLE = "A Simple Pygame outline"
+TITLE = "Find the Sheep"
 
 
 # --------------------------------------------------
@@ -82,7 +80,7 @@ def get_random_sheep_pos():
 async def main():
     global running
     level = 1
-    GAME_OVER = False
+    is_game_over = False
     NEXT_SICK_SHEEP_DELAY = 2000
     
     init_game(level)
@@ -95,7 +93,10 @@ async def main():
     while running:
 
         # Draw the background
-        screen.blit(background, (0, 0))
+        if background is None:
+            screen.fill((0, 0, 0))
+        else:
+            screen.blit(background, (0, 0))
         
         
         for event in pygame.event.get():
@@ -106,12 +107,17 @@ async def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
+                if event.key== pygame.K_m:
+                    musicManager.toggle_music()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
                 for sheep in flock:
                     score += sheep.handle_click(pos)
 
+        # if running is false exit application
+        if not running:
+            break
         
         menuManager.draw_score(score)
         
@@ -139,7 +145,7 @@ async def main():
         
         # Check if all sheep are found
         all_found = all(sheep.isFound for sheep in flock)
-        if all_found and not GAME_OVER:
+        if all_found and not is_game_over:
             # Draw end level screen and get continue button rect
             continue_rect = menuManager.show_end_level(score, level)
             musicManager.stop_music()
@@ -187,12 +193,7 @@ async def main():
         remaining = menuManager.draw_timer(start_ticks)
         
         # If time's up, show final screen then quit
-        if remaining <= 0:
-            GAME_OVER = True
-            menuManager.show_end_screen(score)
-            musicManager.stop_music()
-            pygame.display.flip()
-            await asyncio.sleep(10)
+        is_game_over = await check_game_over(is_game_over, remaining, score)
 
         # Display the new screen
         pygame.display.flip()
@@ -200,6 +201,23 @@ async def main():
         await asyncio.sleep(0)
 
     pygame.quit()
+
+
+async def check_game_over(game_over: bool, remaining: int, score: int) -> bool:
+    """
+    Checks if a game is over
+    @param game_over: bool
+    @param remaining: int
+    @param score: int
+    @return: bool, true if game is over, false otherwise
+    """
+    if remaining <= 0:
+        game_over = True
+        menuManager.show_end_screen(score)
+        musicManager.stop_music()
+        pygame.display.flip()
+        await asyncio.sleep(10)
+    return game_over
 
 
 # --------------------------------------------------
