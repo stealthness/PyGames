@@ -1,6 +1,6 @@
 import asyncio
 import os
-from random import randrange
+from random import randrange, randint
 
 import pygame
 from pygame.examples.music_drop_fade import music_file_list
@@ -64,7 +64,7 @@ def init_game(level):
     # create sheep
     for i in range((level -1) * 3 + 5):
         pos = get_random_sheep_pos()
-        flock.append(Sheep(pos))
+        flock.append(Sheep(pos, blaa_sounds=["Hidden/blaa1.ogg", "Hidden/blaa2.ogg", "Hidden/blaa3.ogg"]))
         
 def get_random_sheep_pos():
     while True:
@@ -79,12 +79,14 @@ async def main():
     global running
     level = 1
     GAME_OVER = False
-    
+    NEXT_SICK_SHEEP_DELAY = 2000
     
     init_game(level)
     score = 0
+    
     # start countdown timer
     start_ticks = pygame.time.get_ticks()
+    next_sick_timer = start_ticks + NEXT_SICK_SHEEP_DELAY
 
     while running:
 
@@ -112,24 +114,57 @@ async def main():
         if TEST_MODE:
             pass
     
+        if pygame.time.get_ticks() - start_ticks > next_sick_timer:
+            next_sick_timer = pygame.time.get_ticks() +  NEXT_SICK_SHEEP_DELAY
+            flock[randint(0, len(flock) - 1)].make_sick()
+    
+    
         for sheep in flock:
             sheep.draw(screen)
+        
         
         
         # Check if all sheep are found
         all_found = all(sheep.isFound for sheep in flock)
         if all_found and not GAME_OVER:
-            GAME_OVER = False
-            menuManager.show_end_level(score, level)
+            # Draw end level screen and get continue button rect
+            continue_rect = menuManager.show_end_level(score, level)
             musicManager.stop_music()
             pygame.display.flip()
-            await asyncio.sleep(3)
-            
+
+            # Wait up to 3 seconds, but allow player to click Continue to skip the wait
+            clicked = False
+            wait_start = pygame.time.get_ticks()
+            timeout_ms = 8000
+            while not clicked and (pygame.time.get_ticks() - wait_start) < timeout_ms and running:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+                        break
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            running = False
+                            break
+                        else:
+                            # any key press also continues
+                            clicked = True
+                            break
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        if continue_rect.collidepoint(event.pos):
+                            clicked = True
+                            break
+
+                # keep showing the screen
+                pygame.display.flip()
+                await asyncio.sleep(0.05)
+
             # Advance to next level
+            if not running:
+                break
             level += 1
-            GAME_OVER = False
             init_game(level)
             start_ticks = pygame.time.get_ticks()
+            next_sick_timer = start_ticks + NEXT_SICK_SHEEP_DELAY
             continue
         
         # Draw countdown timer at top center
