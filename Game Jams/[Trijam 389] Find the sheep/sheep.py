@@ -13,15 +13,21 @@ class Sheep:
         self.load_image(image_path, sick_image_path)
         self.isSick = False
         self.blaa_sounds = blaa_sounds
+        self.isDead = False
         
     def make_sick(self):
-        if self.isFound:
+        if self.isFound or self.isDead:
             return
         self.isSick = True
         
+    def die(self):
+        if self.isFound or self.isDead:
+            return
+        self.isDead = True
+        self.isSick = False
     
     def is_active(self):
-        return not self.isFound
+        return not self.isFound and not self.isDead
 
     def draw(self, screen) -> None:
         """
@@ -29,7 +35,7 @@ class Sheep:
         :param screen: 
         :return: None
         """
-        if self.isFound:
+        if self.isFound or self.isDead:
             return
         
         if self.isSick:
@@ -38,6 +44,9 @@ class Sheep:
             screen.blit(self.image, self.rect)
 
     def handle_click(self, pos)-> int:
+        if self.isDead:
+            return 0
+        
         if not self.isFound and self.rect.collidepoint(pos):
             self.isFound = True
             if not self.blaa_sounds is None:

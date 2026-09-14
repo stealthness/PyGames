@@ -45,6 +45,7 @@ TIMER_SECONDS = 30
 active_boxes = []
 flock = []
 
+
 menuManager = MenuManager(screen)
 musicManager = MusicManager(music_path)
 # --------------------------------------------------
@@ -58,7 +59,7 @@ running = True
 # --------------------------------------------------
 
 
-def init_game(level):
+def init_game(level: int):
     musicManager.play_music()
     flock.clear()
     # create sheep
@@ -81,11 +82,12 @@ async def main():
     global running
     level = 1
     is_game_over = False
-    NEXT_SICK_SHEEP_DELAY = 2000
+    NEXT_SICK_SHEEP_DELAY = randint(800, 2500)
+    
+    score = 0
+    player_lost_sheep_strike = 0
     
     init_game(level)
-    score = 0
-    
     # start countdown timer
     start_ticks = pygame.time.get_ticks()
     next_sick_timer = start_ticks + NEXT_SICK_SHEEP_DELAY
@@ -124,15 +126,23 @@ async def main():
         if TEST_MODE:
             pass
     
+        # Apply sickness to sheep
         if pygame.time.get_ticks() - start_ticks > next_sick_timer:
             next_sick_timer = pygame.time.get_ticks() +  NEXT_SICK_SHEEP_DELAY
             lost_sheep_not_sick = []
+            lost_sheep_sick = []
             for sheep in flock:
-                if sheep.isFound:
+                if sheep.isFound or sheep.isDead:
                     continue
                 if sheep.isSick:
-                    continue
+                    lost_sheep_sick.append(sheep)
                 lost_sheep_not_sick.append(sheep)
+            
+            for sheep in lost_sheep_sick:
+                sheep.die()
+                player_lost_sheep_strike += len(lost_sheep_sick)
+                
+            
             
             if len(lost_sheep_not_sick) > 1:
                 lost_sheep_not_sick[randint(0, len(lost_sheep_not_sick) - 1)].make_sick()
@@ -144,7 +154,7 @@ async def main():
         
         
         # Check if all sheep are found
-        all_found = all(sheep.isFound for sheep in flock)
+        all_found = all(sheep.isFound or sheep.isDead for sheep in flock)
         if all_found and not is_game_over:
             # Draw end level screen and get continue button rect
             continue_rect = menuManager.show_end_level(score, level)
@@ -185,6 +195,8 @@ async def main():
             # reset the level
             init_game(level)
             # Reset the sick timers
+
+            NEXT_SICK_SHEEP_DELAY = randint(800, 2500)
             start_ticks = pygame.time.get_ticks()
             next_sick_timer = start_ticks + NEXT_SICK_SHEEP_DELAY
             continue
@@ -193,7 +205,9 @@ async def main():
         remaining = menuManager.draw_timer(start_ticks)
         
         # If time's up, show final screen then quit
-        is_game_over = await check_game_over(is_game_over, remaining, score)
+        is_game_over = await check_game_over(is_game_over, remaining, score, player_lost_sheep_strike)
+        
+
 
         # Display the new screen
         pygame.display.flip()
@@ -203,7 +217,7 @@ async def main():
     pygame.quit()
 
 
-async def check_game_over(game_over: bool, remaining: int, score: int) -> bool:
+async def check_game_over(game_over: bool, remaining: int, score: int, player_lost_sheep_strike: int) -> bool:
     """
     Checks if a game is over
     @param game_over: bool
@@ -211,7 +225,7 @@ async def check_game_over(game_over: bool, remaining: int, score: int) -> bool:
     @param score: int
     @return: bool, true if game is over, false otherwise
     """
-    if remaining <= 0:
+    if remaining <= 0 or player_lost_sheep_strike > 3 :
         game_over = True
         menuManager.show_end_screen(score)
         musicManager.stop_music()

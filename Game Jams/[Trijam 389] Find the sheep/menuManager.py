@@ -1,7 +1,13 @@
 import pygame
 
+class MenuConfig:
+    WHITE = (255, 255, 255)
+    BLACK = (0, 0, 0)
+    RED = (200,0,0)
+
 
 class MenuManager:
+
     
     def __init__(self, screen):
         self.screen = screen
@@ -9,6 +15,8 @@ class MenuManager:
         self.TIMER_SECONDS = 30
         self.width = self.screen.get_width()
         self.height = self.screen.get_height()
+        
+        
     
     
     def show_end_level(self, score, level):
@@ -20,8 +28,8 @@ class MenuManager:
         # Draw two lines: title and score
         title_text = f"Next Level {level}"
         score_text = f"Your current score is {score}"
-        title_surf = self.font.render(title_text, True, (0, 0, 0))
-        score_surf = self.font.render(score_text, True, (0, 0, 0))
+        title_surf = self.font.render(title_text, True, MenuConfig.BLACK)
+        score_surf = self.font.render(score_text, True, MenuConfig.BLACK)
         center_x = self.width // 2
         center_y = self.height // 2
         title_rect = title_surf.get_rect(center=(center_x, center_y - 24))
@@ -49,16 +57,16 @@ class MenuManager:
     def show_end_screen(self, score):
         self.screen.fill((133, 87, 50))
         end_text = f"game Over\n\nYour score iss {score}"
-        end_surf = self.font.render(end_text, True, (255, 0, 0))
+        end_surf = self.font.render(end_text, True, MenuConfig.RED)
         end_rect = end_surf.get_rect(center=(self.width // 2, self.height // 2))
         self.screen.blit(end_surf, end_rect)
         
         
     def draw_score(self, score):
-        text_surf = self.font.render(f"{score}", True, (255, 255, 255))
+        text_surf = self.font.render(f"{score}", True, MenuConfig.WHITE)
         text_rect = text_surf.get_rect(midtop=(20, 10))
         # optional shadow for readability
-        shadow_surf = self.font.render(f"{score}", True, (0, 0, 0))
+        shadow_surf = self.font.render(f"{score}", True, MenuConfig.BLACK)
         shadow_rect = shadow_surf.get_rect(midtop=(21, 12))
         self.screen.blit(shadow_surf, shadow_rect)
         self.screen.blit(text_surf, text_rect)
@@ -66,13 +74,11 @@ class MenuManager:
     def draw_timer(self, start_ticks):
         elapsed_ms = pygame.time.get_ticks() - start_ticks
         remaining = max(0, self.TIMER_SECONDS - (elapsed_ms / 1000.0))
-        mins = int(remaining) // 60
-        secs = int(remaining) % 60
-        timer_text = f"{mins}:{secs:02d}"
-        text_surf = self.font.render(timer_text, True, (255, 255, 255))
+        timer_text = self.get_remaining_time_str_in_secs(remaining)
+        text_surf = self.font.render(timer_text, True, MenuConfig.WHITE)
         text_rect = text_surf.get_rect(midtop=(self.width // 2, 10))
         # optional shadow for readability
-        shadow_surf = self.font.render(timer_text, True, (0, 0, 0))
+        shadow_surf = self.font.render(timer_text, True, MenuConfig.BLACK)
         shadow_rect = shadow_surf.get_rect(midtop=(self.width // 2 + 2, 12))
         self.screen.blit(shadow_surf, shadow_rect)
         self.screen.blit(text_surf, text_rect)
@@ -81,3 +87,9 @@ class MenuManager:
     def show_start_menu(self):
         # add start screen with start button and exit application button
         pass
+    
+    @staticmethod
+    def get_remaining_time_str_in_secs(remaining) -> str:
+        mins = int(remaining) // 60
+        secs = int(remaining) % 60
+        return f"{mins}:{secs:02d}"
