@@ -1,59 +1,34 @@
 import asyncio
 import os
-from random import randrange, randint
-
 import pygame
-
 from game import Game
 from menuManager import MenuManager
-from musicManager import MusicManager   
-from sheep import Sheep
 from path_utils import get_base_dir
+from config import WIDTH, HEIGHT, FPS, TITLE, TIMER_SECONDS
 
 # --------------------------------------------------
-# Configuration
+# Configuration & Initialization
 # --------------------------------------------------
 
-WIDTH = 960  # Window width
-# Load the background image (path relative to this script)
-BASE_DIR : str = get_base_dir(False)
+BASE_DIR = get_base_dir(False)
 background_path = os.path.join(BASE_DIR, "Art", "background.png")
-background = pygame.image.load(background_path)
 music_path = os.path.join(BASE_DIR, "Hidden", "geoffharvey-farmyard-fun-374610.ogg")
-HEIGHT = 540
-FPS = 60
-TEST_MODE = True
-TITLE = "Find the Sheep"
 
-
-# --------------------------------------------------
-# Initialization
-# --------------------------------------------------
+# Try to load background, handle missing file gracefully
+try:
+    background = pygame.image.load(background_path)
+except (FileNotFoundError, pygame.error):
+    print(f"Warning: Could not load background from {background_path}")
+    background = None
 
 pygame.init()
-
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption(TITLE)
-
 clock = pygame.time.Clock()
 
-# Font for timer display
-pygame.font.init()
-FONT = pygame.font.SysFont(None, 36)
-
-TIMER_SECONDS = 4
-
-active_boxes = []
+# Global game state
 flock = []
-
-
 menuManager = MenuManager(screen, timer_seconds=TIMER_SECONDS)
-musicManager = MusicManager(music_path)
-# --------------------------------------------------
-# Game State
-# --------------------------------------------------
-
-running = True
 
 # --------------------------------------------------
 # Async Game Loop
@@ -72,106 +47,82 @@ def init_game(level: int):
     
     
         
-def get_random_sheep_pos():
-    while True:
-        pos = randrange((WIDTH - 40)), randrange((HEIGHT-40))
-        if 400 < pos[0] < 500 and 100 < pos[1] < 300:
-            continue
-        else:
-            return pos
-        
-        
+
 async def main():
-    global running
-    level = 1
-    score = 0
-    player_lost_sheep_strike = 0
+    """Main async game loop."""
     game_status = "menu"
-
-    NEXT_SICK_SHEEP_DELAY = randint(800, 2500)
-    start_ticks = pygame.time.get_ticks()
-    next_sick_timer = start_ticks + NEXT_SICK_SHEEP_DELAY
-    game = Game(screen,background, flock, music_path)
-
-
+    game = Game(screen, background, flock, music_path)
+    running = True
+    
     while running:
-
+        # Menu state
         if game_status == "menu":
             game_status = StartMenu.run_start_menu()
-            screen.fill((0, 0, 200))
-            continue_rect = menuManager.show_start_menu()
-            pygame.display.flip()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                    break
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        running = False
-                        break
-                    if event.key == pygame.K_SPACE:
-                        game_status = "init_game"
-                        break
-                    elif event.type == pygame.MOUSEBUTTONDOWN:
-                        if continue_rect.collidepoint(event.pos):
-                            print('clicked')
-                            game_status = "init_game"
-                        break
-            
+            if game_status == "quit":
+                running = False
+            await asyncio.sleep(0)
             continue
-            
+        
+        # Initialize new game
         if game_status == "init_game":
-            level = 1
-            score = 0
-            player_lost_sheep_strike = 0
-            NEXT_SICK_SHEEP_DELAY = randint(800, 2500)
+            game.score = 0
+            game.strikes = 0
+            game.level = 1
+            game.game_init(1)
             game_status = "start_game"
-            # Draw the background
-            if background is None:
-                screen.fill((0, 0, 0))
-            else:
-                screen.blit(background, (0, 0))
-            pygame.display.flip()
             continue
-            
+        
+        # Main gameplay loop
         if game_status == "start_game":
-            game_status = game.run()
-
-        if game_status == "game_over":
-            print("Game Over")
-            menuManager.show_end_screen(score)            
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                    break
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        running = False
-                        break
-                    if event.key == pygame.K_SPACE:
-                        game_status = "menu_game"
-                        break
-
-        # Display the new screen
-        pygame.display.flip()
-        print(game_status)
-        await asyncio.sleep(0)
-
+            game_status = await game.run()
+            if game_status == "quit":
+                running = False
+            elif game_status == "game_over":
+                # Wait for user input before returning to menu
+                wait_screen = True
+                while wait_screen:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            running = False
+                            wait_screen = False
+                        elif event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_ESCAPE:
+                                running = False
+                                wait_screen = False
+                            elif event.key == pygame.K_SPACE:
+                                game_status = "menu"
+                                wait_screen = False
+                    pygame.display.flip()
+                    await asyncio.sleep(0.05)
+            continue
+    
     pygame.quit()
 
-
-async def reset_score(is_game_over: bool, level: int, player_lost_sheep_strike: int, score: int):
-    level = 1
-    score = 0
-    player_lost_sheep_strike = 0
-    is_game_over = False
 
 
 
 class StartMenu:
+    """Handles the start menu display and input."""
     
     @staticmethod
     def run_start_menu() -> str:
+        """Show start menu and return next game status."""
+        screen.fill((100, 200, 200))
+        continue_rect = menuManager.show_start_menu()
+        pygame.display.flip()
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return "quit"
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return "quit"
+                if event.key == pygame.K_SPACE:
+                    return "init_game"
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if continue_rect.collidepoint(event.pos):
+                    return "init_game"
+        
         return "menu"
 
 
