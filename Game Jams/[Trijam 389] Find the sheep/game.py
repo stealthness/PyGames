@@ -78,10 +78,11 @@ class Game:
                     sheep.die()
                 self.strikes += 1
             
-            # Make a random healthy sheep sick
-            healthy_sheep = [s for s in active_sheep if not s.isSick]
-            if healthy_sheep:
-                healthy_sheep[randint(0, len(healthy_sheep) - 1)].make_sick()
+            # Make a random healthy sheep sick provided there are 3 healthy active sheep
+            if len(active_sheep) > 2:
+                healthy_sheep = [s for s in active_sheep if not s.isSick]
+                if healthy_sheep:
+                    healthy_sheep[randint(0, len(healthy_sheep) - 1)].make_sick()
 
     def draw_background(self):
         """Draw the game background."""
@@ -133,7 +134,10 @@ class Game:
             # Check if game over
             if self.check_game_over(remaining):
                 self.musicManager.stop_music()
-                self.menuManager.show_end_screen(self.score)
+                if self.strikes >= MAX_STRIKES:
+                    self.menuManager.show_end_screen(self.score, "You lost too many sheep")
+                else:
+                    self.menuManager.show_end_screen(self.score, "You took too long\nto find the sheep\npress space to restart")
                 pygame.display.flip()
                 return "game_over"
             

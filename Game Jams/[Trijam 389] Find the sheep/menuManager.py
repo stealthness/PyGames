@@ -5,7 +5,7 @@ import pygame
 class MenuConfig:
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
-    RED = (200,0,0)
+    RED = (100,0,0)
 
 
 class MenuManager:
@@ -48,9 +48,9 @@ class MenuManager:
                                              22)
         return btn_rect
         
-    def show_end_screen(self, score):
-        self.screen.fill((133, 87, 50))
-        end_text = f"game Over\n\nYour score iss {score}"
+    def show_end_screen(self, score, reason="You were bad"):
+        self.screen.fill((200, 100, 100))
+        end_text = f"Game Over\n{reason}\nYour score is {score}"
         end_surf = self.font.render(end_text, True, MenuConfig.RED)
         end_rect = end_surf.get_rect(center=(self.width // 2, self.height // 2))
         self.screen.blit(end_surf, end_rect)

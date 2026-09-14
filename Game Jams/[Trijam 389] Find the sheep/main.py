@@ -35,19 +35,6 @@ menuManager = MenuManager(screen, timer_seconds=TIMER_SECONDS)
 # --------------------------------------------------
 
 
-def init_game(level: int):
-    musicManager.play_music()
-    flock.clear()
-    # create sheep
-    for i in range(level * 3 + 2):
-        pos = get_random_sheep_pos()
-        flock.append(Sheep(pos, blaa_sounds=["Hidden/blaa1.ogg", "Hidden/blaa2.ogg", "Hidden/blaa3.ogg"]))
-    
-
-    
-    
-        
-
 async def main():
     """Main async game loop."""
     game_status = "menu"
