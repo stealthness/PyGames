@@ -128,6 +128,8 @@ class Game:
             # Draw countdown timer
             remaining = self.menuManager.draw_timer(self.start_ticks)
             
+            self.menuManager.draw_deaths(self.strikes)
+            
             # Check if game over
             if self.check_game_over(remaining):
                 self.musicManager.stop_music()

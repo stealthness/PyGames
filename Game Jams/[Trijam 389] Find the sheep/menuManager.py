@@ -27,33 +27,25 @@ class MenuManager:
         Returns the pygame.Rect of the Continue button so caller can detect clicks.
         """
         self.screen.fill((223, 237, 149))
-        # Draw two lines: title and score
-        title_text = f"Next Level {level}"
-        score_text = f"Your current score is {score}"
-        title_surf = self.font.render(title_text, True, MenuConfig.BLACK)
-        score_surf = self.font.render(score_text, True, MenuConfig.BLACK)
-        center_x = self.width // 2
-        center_y = self.height // 2
-        title_rect = title_surf.get_rect(center=(center_x, center_y - 24))
-        score_rect = score_surf.get_rect(center=(center_x, center_y + 4))
-        self.screen.blit(title_surf, title_rect)
-        self.screen.blit(score_surf, score_rect)
+        
+        # Draw title and score using refactored helper
+        MenuManager.create_text_at(self.screen,
+                                   f"Next Level {level}",
+                                   self.font,
+                                   (0, 50),
+                                   40)
+        MenuManager.create_text_at(self.screen,
+                                   f"Your current score is {score}",
+                                   self.font,
+                                   (0, -20),
+                                   40)
 
-        # Draw a Continue button below the text
-        btn_w, btn_h = 220, 48
-        btn_x = center_x - btn_w // 2
-        btn_y = center_y + 48
-        btn_rect = pygame.Rect(btn_x, btn_y, btn_w, btn_h)
-        # button background
-        pygame.draw.rect(self.screen, (30, 144, 255), btn_rect, border_radius=8)
-        # button border
-        pygame.draw.rect(self.screen, (0,0,0), btn_rect, width=2, border_radius=8)
-        # button text
-        btn_font = pygame.font.SysFont("Arial", 22)
-        btn_surf = btn_font.render("Continue", True, (0,0,0))
-        btn_text_rect = btn_surf.get_rect(center=btn_rect.center)
-        self.screen.blit(btn_surf, btn_text_rect)
-
+        # Draw Continue button using refactored helper
+        btn_rect = MenuManager.create_btn_at(self.screen,
+                                             "Continue",
+                                             self.font,
+                                             (0, -100),
+                                             22)
         return btn_rect
         
     def show_end_screen(self, score):
@@ -64,27 +56,34 @@ class MenuManager:
         self.screen.blit(end_surf, end_rect)
         
         
-    def draw_score(self, score):
-        text_surf = self.font.render(f"{score}", True, MenuConfig.WHITE)
-        text_rect = text_surf.get_rect(midtop=(20, 10))
-        # optional shadow for readability
-        shadow_surf = self.font.render(f"{score}", True, MenuConfig.BLACK)
-        shadow_rect = shadow_surf.get_rect(midtop=(21, 12))
+    def _draw_text_with_shadow(self, text, pos, color=MenuConfig.WHITE, shadow_offset=(1, 2)):
+        """Helper to draw text with shadow for readability. pos should be a pygame alignment tuple like midtop."""
+        text_surf = self.font.render(text, True, color)
+        text_rect = text_surf.get_rect(**{pos[0]: (pos[1][0], pos[1][1])})
+        
+        # Draw shadow
+        shadow_surf = self.font.render(text, True, MenuConfig.BLACK)
+        shadow_rect = shadow_surf.get_rect(**{pos[0]: (pos[1][0] + shadow_offset[0], pos[1][1] + shadow_offset[1])})
         self.screen.blit(shadow_surf, shadow_rect)
+        
+        # Draw text
         self.screen.blit(text_surf, text_rect)
         
+    def draw_score(self, score):
+        """Draw score in top-left with shadow."""
+        self._draw_text_with_shadow(f"{score}", ("midtop", (20, 10)))
+        
     def draw_timer(self, start_ticks):
+        """Draw countdown timer at top-center with shadow. Returns remaining seconds."""
         elapsed_ms = pygame.time.get_ticks() - start_ticks
         remaining = max(0, self.TIMER_SECONDS - (elapsed_ms / 1000.0))
         timer_text = self.get_remaining_time_str_in_secs(remaining)
-        text_surf = self.font.render(timer_text, True, MenuConfig.WHITE)
-        text_rect = text_surf.get_rect(midtop=(self.width // 2, 10))
-        # optional shadow for readability
-        shadow_surf = self.font.render(timer_text, True, MenuConfig.BLACK)
-        shadow_rect = shadow_surf.get_rect(midtop=(self.width // 2 + 2, 12))
-        self.screen.blit(shadow_surf, shadow_rect)
-        self.screen.blit(text_surf, text_rect)
+        self._draw_text_with_shadow(timer_text, ("midtop", (self.width // 2, 10)))
         return remaining
+    
+    def draw_deaths(self, deaths=0):
+        """Draw score in top-left with shadow."""
+        self._draw_text_with_shadow(f"deaths:{deaths}", ("midtop", (self.width -90, 10)))
     
     def show_start_menu(self):
         """
@@ -124,12 +123,14 @@ class MenuManager:
     def create_text_at(screen,
                        text, 
                        font,
-                       position:tuple,
-                       font_size = 20):
-        text_surf = font.render(text, True, MenuConfig.BLACK)
+                       position: tuple,
+                       font_size=20):
+        """Draw text at screen center + offset. Position is (x_offset, y_offset)."""
         center_x = screen.get_rect().centerx
         center_y = screen.get_rect().centery
-        text_rect = text_surf.get_rect(center=(center_x - position[0], center_y -position[1] ))
+        text_font = pygame.font.SysFont("Arial", font_size)
+        text_surf = text_font.render(text, True, MenuConfig.BLACK)
+        text_rect = text_surf.get_rect(center=(center_x - position[0], center_y - position[1]))
         screen.blit(text_surf, text_rect)
         
     
@@ -140,20 +141,25 @@ class MenuManager:
                       position,
                       font_size = 20
                       ):
+        """Draw a button at screen center + offset. Returns button rect for click detection."""
         center_x = screen.get_rect().centerx
         center_y = screen.get_rect().centery
-        # Draw a Start button below the text
+        
+        # Draw button with size and position
         btn_w, btn_h = 220, 48
         btn_x = center_x - btn_w // 2
-        btn_y = center_y + 150
+        btn_y = center_y - position[1]
         btn_rect = pygame.Rect(btn_x, btn_y, btn_w, btn_h)
+        
         # button background
         pygame.draw.rect(screen, (30, 144, 255), btn_rect, border_radius=8)
         # button border
-        pygame.draw.rect(screen, (0,0,0), btn_rect, width=2, border_radius=8)
+        pygame.draw.rect(screen, (0, 0, 0), btn_rect, width=2, border_radius=8)
+        
         # button text
-        btn_font = pygame.font.SysFont("Arial", 22)
-        btn_surf = btn_font.render("Start", True, (0,0,0))
+        btn_font = pygame.font.SysFont("Arial", font_size)
+        btn_surf = btn_font.render(text, True, (0, 0, 0))
         btn_text_rect = btn_surf.get_rect(center=btn_rect.center)
-        screen.blit(btn_surf, btn_text_rect) 
+        screen.blit(btn_surf, btn_text_rect)
+        
         return btn_rect
