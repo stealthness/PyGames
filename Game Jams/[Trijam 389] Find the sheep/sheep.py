@@ -3,7 +3,6 @@ from random import randint
 
 import pygame
 
-BASE_DIR = os.path.dirname(__file__)
 
 class Sheep:
     def __init__(self, position, image_path=None, sick_image_path=None):
@@ -37,6 +36,9 @@ class Sheep:
         if image_path is None:
             random_sheep = randint(1,3)
             print(f"sheep{random_sheep}.png")
+
+            BASE_DIR = os.path.dirname(__file__) # windows
+            #BASE_DIR = "" #pygbag
             image_path = os.path.join(BASE_DIR, "Art", f"sheep{random_sheep}.png")
             sick_image_path = os.path.join(BASE_DIR, "Art", f"sheep{random_sheep}.png")
         if os.path.exists(image_path) and os.path.exists(sick_image_path):

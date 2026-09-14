@@ -14,6 +14,7 @@ from sheep import Sheep
 WIDTH = 960  # Window width
 # Load the background image (path relative to this script)
 BASE_DIR : str = os.path.dirname(__file__)
+#BASE_DIR : str = "" # pygbag
 background_path = os.path.join(BASE_DIR, "Art", "background.png")
 background = pygame.image.load(background_path)
 HEIGHT = 540
@@ -114,10 +115,10 @@ async def main():
         # Check if all sheep are found
         all_found = all(sheep.isFound for sheep in flock)
         if all_found and not GAME_OVER:
-            GAME_OVER = True
-            menuManager.show_end_screen(f"Level {level} Complete!")
+            GAME_OVER = False
+            menuManager.show_end_level(score, level)
             pygame.display.flip()
-            await asyncio.sleep(2)
+            await asyncio.sleep(3)
             
             # Advance to next level
             level += 1
@@ -132,9 +133,9 @@ async def main():
         # If time's up, show final screen then quit
         if remaining <= 0:
             GAME_OVER = True
-            menuManager.show_end_screen(2)
+            menuManager.show_end_screen(score)
             pygame.display.flip()
-            await asyncio.sleep(2)
+            await asyncio.sleep(10)
 
         # Display the new screen
         pygame.display.flip()

@@ -10,11 +10,18 @@ class MenuManager:
         self.width = self.screen.get_width()
         self.height = self.screen.get_height()
     
+    
+    def show_end_level(self, score, level):
+        self.screen.fill((0,0,0))
+        level_text = f"Next Level {level} \n\nYour current score is {score} "
+        end_surf = self.font.render(level_text, True, (255, 0, 0))
+        end_rect = end_surf.get_rect(center=(self.width // 2, self.height // 2))
+        self.screen.blit(end_surf, end_rect)
         
         
     def show_end_screen(self, score):
         self.screen.fill((0,0,0))
-        end_text = "game Over"
+        end_text = f"game Over\n\nYour score iss {score}"
         end_surf = self.font.render(end_text, True, (255, 0, 0))
         end_rect = end_surf.get_rect(center=(self.width // 2, self.height // 2))
         self.screen.blit(end_surf, end_rect)
