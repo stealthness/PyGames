@@ -4,6 +4,7 @@ from random import randrange, randint
 
 import pygame
 
+from game import Game
 from menuManager import MenuManager
 from musicManager import MusicManager   
 from sheep import Sheep
@@ -15,7 +16,7 @@ from path_utils import get_base_dir
 
 WIDTH = 960  # Window width
 # Load the background image (path relative to this script)
-BASE_DIR : str = get_base_dir(True)
+BASE_DIR : str = get_base_dir(False)
 background_path = os.path.join(BASE_DIR, "Art", "background.png")
 background = pygame.image.load(background_path)
 music_path = os.path.join(BASE_DIR, "Hidden", "geoffharvey-farmyard-fun-374610.ogg")
@@ -40,13 +41,13 @@ clock = pygame.time.Clock()
 pygame.font.init()
 FONT = pygame.font.SysFont(None, 36)
 
-TIMER_SECONDS = 30
+TIMER_SECONDS = 4
 
 active_boxes = []
 flock = []
 
 
-menuManager = MenuManager(screen)
+menuManager = MenuManager(screen, timer_seconds=TIMER_SECONDS)
 musicManager = MusicManager(music_path)
 # --------------------------------------------------
 # Game State
@@ -63,9 +64,11 @@ def init_game(level: int):
     musicManager.play_music()
     flock.clear()
     # create sheep
-    for i in range((level -1) * 3 + 5):
+    for i in range(level * 3 + 2):
         pos = get_random_sheep_pos()
         flock.append(Sheep(pos, blaa_sounds=["Hidden/blaa1.ogg", "Hidden/blaa2.ogg", "Hidden/blaa3.ogg"]))
+    
+
     
     
         
@@ -81,157 +84,96 @@ def get_random_sheep_pos():
 async def main():
     global running
     level = 1
-    is_game_over = False
-    NEXT_SICK_SHEEP_DELAY = randint(800, 2500)
-    
     score = 0
     player_lost_sheep_strike = 0
-    
-    init_game(level)
-    # start countdown timer
+    game_status = "menu"
+
+    NEXT_SICK_SHEEP_DELAY = randint(800, 2500)
     start_ticks = pygame.time.get_ticks()
     next_sick_timer = start_ticks + NEXT_SICK_SHEEP_DELAY
+    game = Game(screen,background, flock, music_path)
+
 
     while running:
 
-        # Draw the background
-        if background is None:
-            screen.fill((0, 0, 0))
-        else:
-            screen.blit(background, (0, 0))
-        
-        
-        for event in pygame.event.get():
-
-            if event.type == pygame.QUIT:
-                running = False
-
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-                if event.key== pygame.K_m:
-                    musicManager.toggle_music()
-
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                pos = event.pos
-                for sheep in flock:
-                    score += sheep.handle_click(pos)
-
-        # if running is false exit application
-        if not running:
-            break
-        
-        menuManager.draw_score(score)
-        
-        if TEST_MODE:
-            pass
-    
-        # Apply sickness to sheep
-        if pygame.time.get_ticks() - start_ticks > next_sick_timer:
-            next_sick_timer = pygame.time.get_ticks() +  NEXT_SICK_SHEEP_DELAY
-            lost_sheep_not_sick = []
-            lost_sheep_sick = []
-            for sheep in flock:
-                if sheep.isFound or sheep.isDead:
-                    continue
-                if sheep.isSick:
-                    lost_sheep_sick.append(sheep)
-                lost_sheep_not_sick.append(sheep)
-            
-            for sheep in lost_sheep_sick:
-                sheep.die()
-                player_lost_sheep_strike += len(lost_sheep_sick)
-                
-            
-            
-            if len(lost_sheep_not_sick) > 1:
-                lost_sheep_not_sick[randint(0, len(lost_sheep_not_sick) - 1)].make_sick()
-    
-    
-        for sheep in flock:
-            sheep.draw(screen)
-        
-        
-        
-        # Check if all sheep are found
-        all_found = all(sheep.isFound or sheep.isDead for sheep in flock)
-        if all_found and not is_game_over:
-            # Draw end level screen and get continue button rect
-            continue_rect = menuManager.show_end_level(score, level)
-            musicManager.stop_music()
+        if game_status == "menu":
+            game_status = StartMenu.run_start_menu()
+            screen.fill((0, 0, 200))
+            continue_rect = menuManager.show_start_menu()
             pygame.display.flip()
-
-            # Wait up to 3 seconds, but allow player to click Continue to skip the wait
-            clicked = False
-            wait_start = pygame.time.get_ticks()
-            timeout_ms = 8000
-            while not clicked and (pygame.time.get_ticks() - wait_start) < timeout_ms and running:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    break
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
                         running = False
                         break
-                    elif event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            running = False
-                            break
-                        else:
-                            # any key press also continues
-                            clicked = True
-                            break
+                    if event.key == pygame.K_SPACE:
+                        game_status = "init_game"
+                        break
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         if continue_rect.collidepoint(event.pos):
-                            clicked = True
-                            break
-
-                # keep showing the screen
-                pygame.display.flip()
-                await asyncio.sleep(0.05)
-
-            # Advance to next level
-            if not running:
-                break
-            # increase the level
-            level += 1
-            # reset the level
-            init_game(level)
-            # Reset the sick timers
-
-            NEXT_SICK_SHEEP_DELAY = randint(800, 2500)
-            start_ticks = pygame.time.get_ticks()
-            next_sick_timer = start_ticks + NEXT_SICK_SHEEP_DELAY
+                            print('clicked')
+                            game_status = "init_game"
+                        break
+            
             continue
-        
-        # Draw countdown timer at top center
-        remaining = menuManager.draw_timer(start_ticks)
-        
-        # If time's up, show final screen then quit
-        is_game_over = await check_game_over(is_game_over, remaining, score, player_lost_sheep_strike)
-        
+            
+        if game_status == "init_game":
+            level = 1
+            score = 0
+            player_lost_sheep_strike = 0
+            NEXT_SICK_SHEEP_DELAY = randint(800, 2500)
+            game_status = "start_game"
+            # Draw the background
+            if background is None:
+                screen.fill((0, 0, 0))
+            else:
+                screen.blit(background, (0, 0))
+            pygame.display.flip()
+            continue
+            
+        if game_status == "start_game":
+            game_status = game.run()
 
+        if game_status == "game_over":
+            print("Game Over")
+            menuManager.show_end_screen(score)            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    break
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                        break
+                    if event.key == pygame.K_SPACE:
+                        game_status = "menu_game"
+                        break
 
         # Display the new screen
         pygame.display.flip()
-        
+        print(game_status)
         await asyncio.sleep(0)
 
     pygame.quit()
 
 
-async def check_game_over(game_over: bool, remaining: int, score: int, player_lost_sheep_strike: int) -> bool:
-    """
-    Checks if a game is over
-    @param game_over: bool
-    @param remaining: int
-    @param score: int
-    @return: bool, true if game is over, false otherwise
-    """
-    if remaining <= 0 or player_lost_sheep_strike > 3 :
-        game_over = True
-        menuManager.show_end_screen(score)
-        musicManager.stop_music()
-        pygame.display.flip()
-        await asyncio.sleep(10)
-    return game_over
+async def reset_score(is_game_over: bool, level: int, player_lost_sheep_strike: int, score: int):
+    level = 1
+    score = 0
+    player_lost_sheep_strike = 0
+    is_game_over = False
+
+
+
+class StartMenu:
+    
+    @staticmethod
+    def run_start_menu() -> str:
+        return "menu"
+
 
 
 # --------------------------------------------------

@@ -1,6 +1,7 @@
 import os
 from enum import Enum
 
+
 import pygame
 
 class MenuAction (Enum):
@@ -13,6 +14,8 @@ class MenuManager:
     Manages the main menu display and button interactions.
     """
 
+   
+
     def __init__(self, screen):
         """
         Initialize the menu.
@@ -24,10 +27,7 @@ class MenuManager:
         self.screen_rect = screen.get_rect()
 
         
-        # cwd  = "Game Jams/[Trijam 389] Find the sheep/Font" # for PyCharm windows build
-        cwd = os.path.join(os.getcwd(), "Game Jams", "[Trijam 389] Find the sheep")
-        # cwd = '' required for pygbag archive build
-        # cwd = ''  # use for macos
+        cwd = ""
         font_path = os.path.join(cwd, 'Font', 'Montserrat-Bold.ttf')
         
         # Fonts

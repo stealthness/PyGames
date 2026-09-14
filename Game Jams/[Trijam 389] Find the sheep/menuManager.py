@@ -9,10 +9,10 @@ class MenuConfig:
 class MenuManager:
 
     
-    def __init__(self, screen):
+    def __init__(self, screen, timer_seconds=30):
         self.screen = screen
-        self.font = pygame.font.SysFont("Arial", 20)
-        self.TIMER_SECONDS = 30
+        self.font = pygame.font.SysFont("Arial", 40)
+        self.TIMER_SECONDS = timer_seconds
         self.width = self.screen.get_width()
         self.height = self.screen.get_height()
         
@@ -85,8 +85,39 @@ class MenuManager:
         return remaining
     
     def show_start_menu(self):
-        # add start screen with start button and exit application button
-        pass
+        """
+    Draw the end-of-level screen and a Continue button.
+    Returns the pygame.Rect of the Continue button so caller can detect clicks.
+    """
+        self.screen.fill((223, 237, 149))
+        # Draw two lines: title and score
+        title_text = f"Find the Sheep"
+        descr_text = f"Your  job is to find all the lost sheep\nWatchout for sick sheep\nPress space to start"
+        title_surf = self.font.render(title_text, True, MenuConfig.BLACK)
+        score_surf = self.font.render(descr_text, True, MenuConfig.BLACK)
+        center_x = self.width // 2
+        center_y = self.height // 2
+        title_rect = title_surf.get_rect(center=(center_x, center_y -200))
+        score_rect = score_surf.get_rect(center=(center_x, center_y + 20))
+        self.screen.blit(title_surf, title_rect)
+        self.screen.blit(score_surf, score_rect)
+        # 
+        # Draw a Start button below the text
+        btn_w, btn_h = 220, 48
+        btn_x = center_x - btn_w // 2
+        btn_y = center_y + 150
+        btn_rect = pygame.Rect(btn_x, btn_y, btn_w, btn_h)
+        # button background
+        pygame.draw.rect(self.screen, (30, 144, 255), btn_rect, border_radius=8)
+        # button border
+        pygame.draw.rect(self.screen, (0,0,0), btn_rect, width=2, border_radius=8)
+        # button text
+        btn_font = pygame.font.SysFont("Arial", 22)
+        btn_surf = btn_font.render("Start", True, (0,0,0))
+        btn_text_rect = btn_surf.get_rect(center=btn_rect.center)
+        self.screen.blit(btn_surf, btn_text_rect)   
+        
+        return btn_rect
     
     @staticmethod
     def get_remaining_time_str_in_secs(remaining) -> str:
