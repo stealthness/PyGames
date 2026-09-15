@@ -4,20 +4,22 @@ from random import randint, randrange
 from musicManager import MusicManager
 from menuManager import MenuManager
 from sheep import Sheep
+from wolf import Wolf
 from config import (
     TIMER_SECONDS, MAX_STRIKES, STARTING_SHEEP_COUNT, DIFFICULTY_SCALING,
     SICK_SHEEP_DELAY_MIN, SICK_SHEEP_DELAY_MAX, LEVEL_TRANSITION_TIMEOUT,
-    MENU_EXCLUSION_ZONE
+    MENU_EXCLUSION_ZONE, STARTING_WOLF_COUNT
 )
 
 
 class Game:
     """Main game class managing game state and logic."""
     
-    def __init__(self, screen, background, flock, music_path):
+    def __init__(self, screen, background, flock, pack, music_path):
         self.screen = screen
         self.background = background
         self.flock = flock
+        self.wolf_pack = pack
         self.musicManager = MusicManager(music_path)
         self.menuManager = MenuManager(self.screen, timer_seconds=TIMER_SECONDS)
         self.level = 1
@@ -37,9 +39,14 @@ class Game:
         self.musicManager.play_music()
         self.flock.clear()
         sheep_count = (level - 1) * DIFFICULTY_SCALING + STARTING_SHEEP_COUNT
+        wolf_count = (level + 1) // DIFFICULTY_SCALING + STARTING_WOLF_COUNT
         for _ in range(sheep_count):
             pos = self.get_random_sheep_pos()
             self.flock.append(Sheep(pos, blaa_sounds=["Hidden/blaa1.ogg", "Hidden/blaa2.ogg", "Hidden/blaa3.ogg"]))
+        
+        for _ in range(wolf_count):
+            pos = (100, 100)
+            self.wolf_pack.append(Wolf(pos, "Art/wolkf1.png"))
         
         # Reset sick sheep timers
         self.next_sick_delay = randint(SICK_SHEEP_DELAY_MIN, SICK_SHEEP_DELAY_MAX)
@@ -124,6 +131,8 @@ class Game:
             # Draw all sheep and UI
             for sheep in self.flock:
                 sheep.draw(self.screen)
+            for wolf in self.wolf_pack:
+                wolf.draw(self.screen)
             self.menuManager.draw_score(self.score)
             
             # Draw countdown timer
