@@ -10,5 +10,5 @@ def get_base_dir(pygbag_build = False) -> str:
     # Allow override from environment for alternate build systems
     if pygbag_build:
         return ""
-    return os.path.dirname(__file__)
+    return os.path.dirname(os.path.dirname(__file__))
 

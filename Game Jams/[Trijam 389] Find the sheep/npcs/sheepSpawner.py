@@ -1,7 +1,9 @@
 from random import randrange
 
-from sheep import Sheep
-from config import STARTING_SHEEP_COUNT, DIFFICULTY_SCALING
+from npcs.sheep import Sheep
+from core.config import STARTING_SHEEP_COUNT, DIFFICULTY_SCALING
+from core.path_utils import get_base_dir
+import os
 
 
 class SheepSpawner:
@@ -13,15 +15,20 @@ class SheepSpawner:
     def spawn(self, level: int) -> list:
         sheep_count = (level - 1) * DIFFICULTY_SCALING + STARTING_SHEEP_COUNT
         flock = []
+        base_dir = get_base_dir()
         for _ in range(sheep_count):
             pos = self.get_random_sheep_pos()
             flock.append(
                 Sheep(
                     pos,
-                    image_path="Art/Sheep1.png",
-                    dead_image_path="Art/SheepDead1.png",
-                    sick_image_path="Art/SickSheep1.png",
-                    blaa_sounds=["Hidden/blaa1.ogg", "Hidden/blaa2.ogg", "Hidden/blaa3.ogg"],
+                    image_path=os.path.join(base_dir, "Art", "Sheep1.png"),
+                    dead_image_path=os.path.join(base_dir, "Art", "SheepDead1.png"),
+                    sick_image_path=os.path.join(base_dir, "Art", "SickSheep1.png"),
+                    blaa_sounds=[
+                        os.path.join(base_dir, "Hidden", "blaa1.ogg"),
+                        os.path.join(base_dir, "Hidden", "blaa2.ogg"),
+                        os.path.join(base_dir, "Hidden", "blaa3.ogg"),
+                    ],
                 )
             )
         return flock

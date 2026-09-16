@@ -1,8 +1,7 @@
 import os
 from random import randint
-from typing import Self
 
-from path_utils import get_base_dir
+from core.path_utils import get_base_dir
 
 import pygame
 

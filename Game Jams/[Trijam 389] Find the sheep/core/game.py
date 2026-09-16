@@ -2,12 +2,12 @@ import asyncio
 import pygame
 from random import randint
 
-from musicManager import MusicManager
-from menuManager import MenuManager
-from hayBale import HayBale
-from sheepSpawner import SheepSpawner
-from wolfSpawner import WolfSpawner
-from config import (
+from managers.musicManager import MusicManager
+from managers.menuManager import MenuManager
+from npcs.hayBale import HayBale
+from npcs.sheepSpawner import SheepSpawner
+from npcs.wolfSpawner import WolfSpawner
+from core.config import (
     TIMER_SECONDS, MAX_STRIKES,
     SICK_SHEEP_DELAY_MIN, SICK_SHEEP_DELAY_MAX, LEVEL_TRANSITION_TIMEOUT,
     MENU_EXCLUSION_ZONE

@@ -2,10 +2,10 @@ import asyncio
 import os
 import pygame
 
-from game import Game
-from menuManager import MenuManager
-from path_utils import get_base_dir
-from config import WIDTH, HEIGHT, FPS, TITLE, TIMER_SECONDS
+from core.game import Game
+from managers.menuManager import MenuManager
+from core.path_utils import get_base_dir
+from core.config import WIDTH, HEIGHT, FPS, TITLE, TIMER_SECONDS
 
 # --------------------------------------------------
 # Configuration & Initialization
