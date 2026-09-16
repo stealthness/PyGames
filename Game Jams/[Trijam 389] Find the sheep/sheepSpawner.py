@@ -4,7 +4,7 @@ from sheep import Sheep
 from config import STARTING_SHEEP_COUNT, DIFFICULTY_SCALING
 
 
-class ShepSpawner:
+class SheepSpawner:
     def __init__(self, width: int, height: int, menu_exclusion_zone: tuple):
         self.width = width
         self.height = height

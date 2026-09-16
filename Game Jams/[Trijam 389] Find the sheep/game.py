@@ -4,7 +4,7 @@ from random import randint
 
 from musicManager import MusicManager
 from menuManager import MenuManager
-from shepSpawner import ShepSpawner
+from sheepSpawner import SheepSpawner
 from wolfSpawner import WolfSpawner
 from config import (
     TIMER_SECONDS, MAX_STRIKES,
@@ -28,7 +28,7 @@ class Game:
         self.level = 1
         self.width = screen.get_width()
         self.height = screen.get_height()
-        self.shep_spawner = ShepSpawner(self.width, self.height, MENU_EXCLUSION_ZONE)
+        self.shep_spawner = SheepSpawner(self.width, self.height, MENU_EXCLUSION_ZONE)
         self.wolf_spawner = WolfSpawner(self.width, self.height)
         self.score = 0
         self.strikes = 0
