@@ -1,6 +1,7 @@
 import asyncio
 import pygame
 
+from core.game_status import GameStatus
 from managers.musicManager import MusicManager
 from managers.menuManager import MenuManager
 from managers.creatureManager import CreatureManager
@@ -71,7 +72,7 @@ class Game:
                 self.score += self.creature_manager.handle_click(pos)
         return "continue"
 
-    async def run(self) -> str:
+    async def run(self) -> GameStatus:
         """Main game loop. Returns game status (quit, game_over, next_level)."""
         while True:
             # Draw background
@@ -80,7 +81,7 @@ class Game:
             # Handle input
             status = self.handle_events()
             if status == "quit":
-                return "quit"
+                return GameStatus.QUIT
             
             self.strikes += self.creature_manager.update()
             
@@ -105,7 +106,7 @@ class Game:
                 else:
                     self.game_over_button_rect = self.menuManager.show_end_screen(self.game_over_background, self.score, "You took too long to find the Sheep")
                 pygame.display.flip()
-                return "game_over"
+                return GameStatus.GAME_OVER
             
             # Check if all sheep found
             all_found = self.creature_manager.all_sheep_found()

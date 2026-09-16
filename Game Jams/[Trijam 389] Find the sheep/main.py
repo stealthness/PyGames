@@ -2,6 +2,7 @@ import asyncio
 import pygame
 
 from core.game import Game
+from core.game_status import GameStatus
 from managers.menuManager import MenuManager
 from managers.startMenu import StartMenu
 from core.image_store import ImageStore
@@ -32,36 +33,36 @@ startMenu = StartMenu(screen, menuManager)
 
 async def main():
     """Main async game loop."""
-    game_status = "menu"
+    game_status = GameStatus.MENU
     game = Game(screen, images, music_path)
     running = True
     
     while running:
         # Menu state
-        if game_status == "menu":
+        if game_status == GameStatus.MENU:
             game_status = startMenu.run_start_menu(backgrounds[3])
-            if game_status == "quit":
+            if game_status == GameStatus.QUIT:
                 running = False
             await asyncio.sleep(0)
             continue
         
         # Initialize new game
-        if game_status == "init_game":
+        if game_status == GameStatus.INIT_GAME:
             game.score = 0
             game.strikes = 0
             game.level = 1
             game.game_init(1)
-            game_status = "start_game"
+            game_status = GameStatus.PLAYING
             continue
         
         # Main gameplay loop
-        if game_status == "start_game":
+        if game_status == GameStatus.PLAYING:
             game_status = await game.run()
-            if game_status == "quit":
+            if game_status == GameStatus.QUIT:
                 running = False
-            elif game_status == "game_over":
+            elif game_status == GameStatus.GAME_OVER:
                 game_status = await startMenu.handle_game_over_events(game.game_over_button_rect)
-                if game_status == "quit":
+                if game_status == GameStatus.QUIT:
                     running = False
             continue
     
