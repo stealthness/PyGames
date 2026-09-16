@@ -3,13 +3,12 @@ import pygame
 from core.config import (
     START_WOLF_SPEED,
     NORMAL_WOLF_SPEED,
-    WOLF_ANIMATION_RATE_MS,
-    WOLF_SLOW_ANIMATION_RATE_MS,
     VERTICAL_WOLF_SPEED,
     VERTICAL_SWITCH_PERCENTAGE,
     VERTICAL_SWITCH_CHANGE_DELAY,
 )
 from core.wolf_status import WolfStatus
+from npcs.wolfAnimator import WolfAnimator
 
 class Wolf:
     """
@@ -20,17 +19,13 @@ class Wolf:
         self.is_active = False
         self.hit_points = 3
         self.pos = pos
-        self.wolf_frames = wolf_frames or []
+        self.animator = WolfAnimator(wolf_frames)
         if pos[0] > 0:
             self.direction = 1
         else:
             self.direction = -1
         self.speed = NORMAL_WOLF_SPEED
         self.slow_speed = START_WOLF_SPEED
-        self.animation_rate_ms = WOLF_ANIMATION_RATE_MS
-        self.slow_animation_rate_ms = WOLF_SLOW_ANIMATION_RATE_MS
-        self.animation_start_ticks = pygame.time.get_ticks()
-        self.animation_frame_offset = randint(0, 3)
         self.vertical_speed = VERTICAL_WOLF_SPEED
         self.vertical_direction = 0
         self.next_vertical_switch_ticks = 0
@@ -115,17 +110,12 @@ class Wolf:
         screen_height = surface.get_height() if surface else 1000
         self.screen_width = screen_width
         self.screen_height = screen_height
-        wolf_width = self.get_current_image().get_width()
+        wolf_width = self.animator.get_base_width()
         self.right_limit = screen_width + wolf_width * 2
         self.left_limit = -wolf_width * 2
 
     def get_current_image(self):
-        if not self.wolf_frames:
-            return pygame.Surface((1, 1), pygame.SRCALPHA)
-        elapsed = pygame.time.get_ticks() - self.animation_start_ticks
-        rate = self.slow_animation_rate_ms if self.is_slowing_down() else self.animation_rate_ms
-        frame_index = ((elapsed // rate) + self.animation_frame_offset) % len(self.wolf_frames)
-        return self.wolf_frames[frame_index]
+        return self.animator.get_current_image(self.is_slow_zone())
 
     def is_slowing_down(self):
         return (self.direction > 0 and self.pos[0] < 40) or (self.direction < 0 and self.pos[0] > (self.screen_width - 40))
