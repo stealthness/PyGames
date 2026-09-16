@@ -7,14 +7,13 @@ class Sheep:
     def __init__(self, position, image, sick_image, dead_image, blaa_sounds=None):
         self.pos = position
         self.isFound = False
-        self.color = (240, 255, 255)
-        self.image = image
+        self.isSick = False
+        self.isDead = False
+        self.alive_image = image
         self.sick_image = sick_image
         self.dead_image = dead_image
-        self.rect = self.image.get_rect(topleft=self.pos)
-        self.isSick = False
+        self.rect = self.alive_image.get_rect(topleft=self.pos)
         self.blaa_sounds = blaa_sounds
-        self.isDead = False
         
     def make_sick(self):
         if self.isFound or self.isDead:
@@ -46,7 +45,7 @@ class Sheep:
         if self.isSick:
             screen.blit(self.sick_image, self.get_rect())
         else:
-            screen.blit(self.image, self.get_rect())
+            screen.blit(self.alive_image, self.get_rect())
 
     def handle_click(self, pos)-> int:
         if self.isDead:
@@ -60,7 +59,7 @@ class Sheep:
             return 1
         return 0
 
-    def is_eaton(self):
+    def is_attack_by_wolf(self):
         self.die()
         
     def get_rect(self):

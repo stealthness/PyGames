@@ -9,6 +9,7 @@ from core.config import (
     VERTICAL_SWITCH_PERCENTAGE,
     VERTICAL_SWITCH_CHANGE_DELAY,
 )
+from core.wolf_status import WolfStatus
 
 class Wolf:
     """
@@ -53,31 +54,41 @@ class Wolf:
         :return: 
         """
         if self.is_active:
-            if self.pos[0] >= self.right_limit:
-                self.direction = -1
-                self.pos = (self.pos[0], randint(100, 500))
-                self.vertical_direction = 0
-                self.schedule_vertical_switch()
-            elif self.pos[0] <= self.left_limit:
-                self.direction = 1
-                self.pos = (self.pos[0], randint(100, 500))
-                self.vertical_direction = 0
-                self.schedule_vertical_switch()
-            movement_speed = self.speed
-            if self.direction > 0 and self.pos[0] < 40:
-                movement_speed = self.slow_speed
-            elif self.direction < 0 and self.pos[0] > (self.screen_width - 40):
-                movement_speed = self.slow_speed
-
-            if not self.is_slow_zone():
-                self.update_vertical_direction()
+            if self.get_status() == WolfStatus.SLOW:
+                self.update_slow()
             else:
-                self.vertical_direction = 0
+                self.update_normal()
 
-            x = self.direction * movement_speed + self.pos[0]
-            y = self.pos[1] + (self.vertical_direction * self.vertical_speed)
-            y = self.clamp_vertical_position(y)
-            self.pos = (x, y)
+    def update_normal(self):
+        if self.pos[0] >= self.right_limit:
+            self.direction = -1
+            self.pos = (self.pos[0], randint(100, 500))
+            self.vertical_direction = 0
+            self.schedule_vertical_switch()
+        elif self.pos[0] <= self.left_limit:
+            self.direction = 1
+            self.pos = (self.pos[0], randint(100, 500))
+            self.vertical_direction = 0
+            self.schedule_vertical_switch()
+
+        self.update_vertical_direction()
+        self.move(self.speed)
+
+    def update_slow(self):
+        if self.pos[0] >= self.right_limit:
+            self.direction = -1
+            self.pos = (self.pos[0], randint(100, 500))
+        elif self.pos[0] <= self.left_limit:
+            self.direction = 1
+            self.pos = (self.pos[0], randint(100, 500))
+        self.vertical_direction = 0
+        self.move(self.slow_speed)
+
+    def move(self, movement_speed):
+        x = self.direction * movement_speed + self.pos[0]
+        y = self.pos[1] + (self.vertical_direction * self.vertical_speed)
+        y = self.clamp_vertical_position(y)
+        self.pos = (x, y)
         
     def check_sheep_collision(self, flock) -> int:
         if not self.is_active:
@@ -87,7 +98,7 @@ class Wolf:
         wolf_rect = self.get_current_image().get_rect(topleft=(int(self.pos[0]), int(self.pos[1])))
         for sheep in flock:
             if sheep.is_active() and wolf_rect.colliderect(sheep.get_rect()):
-                sheep.is_eaton()
+                sheep.is_attack_by_wolf()
                 eaton_count += 1
         return eaton_count
                 
@@ -121,6 +132,11 @@ class Wolf:
 
     def is_slow_zone(self):
         return self.is_slowing_down()
+
+    def get_status(self):
+        if self.is_slow_zone():
+            return WolfStatus.SLOW
+        return WolfStatus.NORMAL
 
     def schedule_vertical_switch(self):
         delay_seconds = randint(VERTICAL_SWITCH_CHANGE_DELAY[0], VERTICAL_SWITCH_CHANGE_DELAY[1])
