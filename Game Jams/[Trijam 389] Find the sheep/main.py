@@ -1,7 +1,6 @@
 import asyncio
 import os
 import pygame
-from pygbag import pack
 
 from game import Game
 from menuManager import MenuManager

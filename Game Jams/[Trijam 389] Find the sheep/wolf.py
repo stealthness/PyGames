@@ -1,6 +1,11 @@
 from operator import ifloordiv
+from turtledemo.paint import switchupdown
+from typing import Self
 
 import pygame
+
+
+
 
 
 class Wolf:
@@ -9,7 +14,7 @@ class Wolf:
     across horizontally and kill any sheep it touches
     """
     def __init__(self, pos = (-300, 200), wolf_image_path=None):
-        self.is_toggled_on = False
+        self.is_active = False
         self.hit_points = 3
         self.pos = pos
         self.wolf_image = pygame.image.load(wolf_image_path)
@@ -25,7 +30,9 @@ class Wolf:
         :param screen: 
         :return: 
         """
-        if self.is_toggled_on:
+        if self.is_active:
+            
+            
             screen.blit(self.wolf_image, (self.pos[0], self.pos[1]))
             
     def update(self):
@@ -33,8 +40,11 @@ class Wolf:
         Moves the wolf to the next position
         :return: 
         """
-        if self.is_toggled_on:
-            self.pos[0] += self.direction * self.speed
+        if self.is_active:
+            self.pos = (self.direction * self.speed + self.pos[0], self.pos[1])
             
-            
+    def activate(self, position):
+        self.is_active = True
+        self.pos = position
+    
         
