@@ -43,6 +43,7 @@ class Game:
         self.musicManager.play_music()
         self.creature_manager.init_level(level)
         self.hay_bales = self.hay_bale_spawner.spawn(level)
+        self.shotgun.reset()
         self.start_ticks = pygame.time.get_ticks()
 
     def check_game_over(self, remaining: int) -> bool:

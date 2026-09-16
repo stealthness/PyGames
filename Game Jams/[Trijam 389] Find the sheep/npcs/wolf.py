@@ -18,13 +18,14 @@ class Wolf:
     This class represents a wolf on the screen. it starts from just outside the left or right of the screen and will move
     across horizontally and kill any sheep it touches
     """
-    def __init__(self, pos = (-300, 200), wolf_frames=None):
+    def __init__(self, pos = (-300, 200), wolf_frames=None, dead_image=None):
         self.is_active = False
         self.max_hit_points = 2
         self.hit_points = self.max_hit_points
         self.is_dead = False
         self.pos = pos
         self.animator = WolfAnimator(wolf_frames)
+        self.dead_image = dead_image
         if pos[0] > 0:
             self.direction = 1
         else:
@@ -47,6 +48,8 @@ class Wolf:
             wolf_image = self.get_current_image()
             wolf_image = pygame.transform.flip(wolf_image, self.direction < 0, False)
             screen.blit(wolf_image, (int(self.pos[0]), int(self.pos[1])))
+        elif self.is_dead and self.dead_image is not None:
+            screen.blit(self.dead_image, (int(self.pos[0]), int(self.pos[1])))
             
     def update(self):
         """

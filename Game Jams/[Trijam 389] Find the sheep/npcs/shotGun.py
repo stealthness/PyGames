@@ -22,5 +22,9 @@ class ShotGun:
         self.last_fire_ticks = pygame.time.get_ticks()
         return True
 
+    def reset(self):
+        self.bullets = self.max_bullets
+        self.last_fire_ticks = -self.cooldown_ms
+
     def get_bullets_text(self):
         return f"Bullets: {self.bullets}"
