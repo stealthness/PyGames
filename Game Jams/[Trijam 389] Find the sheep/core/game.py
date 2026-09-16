@@ -71,7 +71,7 @@ class Game:
                     self.musicManager.toggle_music()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
-                self.score += self.creature_manager.handle_click(pos)
+                self.score += self.creature_manager.handle_click(pos, self.shotgun)
         return "continue"
 
     async def run(self) -> GameStatus:

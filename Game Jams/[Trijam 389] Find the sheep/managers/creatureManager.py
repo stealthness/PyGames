@@ -35,7 +35,13 @@ class CreatureManager:
         self.next_sick_delay = randint(SICK_SHEEP_DELAY_MIN, SICK_SHEEP_DELAY_MAX)
         self.next_sick_timer = pygame.time.get_ticks() + self.next_sick_delay
 
-    def handle_click(self, pos) -> int:
+    def handle_click(self, pos, shotgun) -> int:
+        hovered_wolf = self.get_hovered_wolf(pos)
+        if hovered_wolf is not None:
+            if shotgun.fire():
+                hovered_wolf.take_hit()
+            return 0
+
         score = 0
         for sheep in self.flock:
             if sheep.get_rect().collidepoint(pos) and sheep.is_active():

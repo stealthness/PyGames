@@ -20,7 +20,9 @@ class Wolf:
     """
     def __init__(self, pos = (-300, 200), wolf_frames=None):
         self.is_active = False
-        self.hit_points = 3
+        self.max_hit_points = 2
+        self.hit_points = self.max_hit_points
+        self.is_dead = False
         self.pos = pos
         self.animator = WolfAnimator(wolf_frames)
         if pos[0] > 0:
@@ -41,7 +43,7 @@ class Wolf:
         :param screen: 
         :return: 
         """
-        if self.is_active:
+        if self.is_active and not self.is_dead:
             wolf_image = self.get_current_image()
             wolf_image = pygame.transform.flip(wolf_image, self.direction < 0, False)
             screen.blit(wolf_image, (int(self.pos[0]), int(self.pos[1])))
@@ -51,7 +53,7 @@ class Wolf:
         Moves the wolf to the next position
         :return: 
         """
-        if self.is_active:
+        if self.is_active and not self.is_dead:
             if self.get_status() == WolfStatus.SLOW:
                 self.update_slow()
             else:
@@ -89,7 +91,7 @@ class Wolf:
         self.pos = (x, y)
         
     def check_sheep_collision(self, flock) -> int:
-        if not self.is_active:
+        if not self.is_active or self.is_dead:
             return 0
 
         eaton_count = 0
@@ -104,8 +106,20 @@ class Wolf:
                 
     def activate(self, position):
         self.is_active = True
+        self.is_dead = False
+        self.hit_points = self.max_hit_points
         self.pos = position
         self.schedule_vertical_switch()
+
+    def take_hit(self) -> bool:
+        if self.is_dead:
+            return True
+        self.hit_points -= 1
+        if self.hit_points <= 0:
+            self.is_dead = True
+            self.is_active = False
+            return True
+        return False
 
     def set_edge_limits(self):
         surface = pygame.display.get_surface()
