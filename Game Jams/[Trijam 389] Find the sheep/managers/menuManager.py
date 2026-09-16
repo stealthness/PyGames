@@ -93,6 +93,10 @@ class MenuManager:
     def draw_deaths(self, deaths=0):
         """Draw score in top-left with shadow."""
         self._draw_text_with_shadow(f"deaths:{deaths}", ("midtop", (self.width -90, 10)))
+
+    def draw_bullets(self, bullets=0):
+        """Draw bullet count in the top bar."""
+        self._draw_text_with_shadow(f"Bullets: {bullets}", ("midtop", (self.width - 300, 10)))
     
     def show_start_menu(self, image):
         """

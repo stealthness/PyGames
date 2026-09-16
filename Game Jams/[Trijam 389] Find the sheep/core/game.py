@@ -7,8 +7,9 @@ from managers.menuManager import MenuManager
 from managers.creatureManager import CreatureManager
 from core.image_store import ImageStore
 from npcs.hayBaleSpawner import HayBaleSpawner
+from npcs.shotGun import ShotGun
 from core.config import (
-    TIMER_SECONDS, MAX_STRIKES, FPS,
+    TIMER_SECONDS, MAX_STRIKES, FPS, SHOTGUN_MAX_BULLETS,
     LEVEL_TRANSITION_TIMEOUT, MENU_EXCLUSION_ZONE
 )
 
@@ -25,6 +26,7 @@ class Game:
         self.creature_manager = CreatureManager(screen.get_width(), screen.get_height(), images, MENU_EXCLUSION_ZONE)
         self.hay_bale_spawner = HayBaleSpawner(images, self.creature_manager.get_random_sheep_pos)
         self.hay_bales = []
+        self.shotgun = ShotGun(SHOTGUN_MAX_BULLETS)
         self.musicManager = MusicManager(music_path)
         self.menuManager = MenuManager(self.screen, timer_seconds=TIMER_SECONDS)
         self.level = 1
@@ -87,6 +89,7 @@ class Game:
             
             # Draw all sheep and UI
             self.creature_manager.draw(self.screen)
+            self.creature_manager.draw_hover_pointer(self.screen, pygame.mouse.get_pos())
             for hay_bale in self.hay_bales:
                 hay_bale.draw(self.screen)
             self.draw_ui_strip()
@@ -96,6 +99,7 @@ class Game:
             remaining = self.menuManager.draw_timer(self.start_ticks)
             
             self.menuManager.draw_deaths(self.strikes)
+            self.menuManager.draw_bullets(self.shotgun.bullets)
             
             # Check if game over
             if self.check_game_over(remaining):

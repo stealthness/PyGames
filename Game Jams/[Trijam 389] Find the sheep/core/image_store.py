@@ -31,6 +31,9 @@ class ImageStore:
             self._load("Art", "wolf4.png"),
         ]
         self.hay_bale_image = self._load("Art", "HayBale1.png")
+        self.pointer_image = self._load("Art", "pointer1.png")
+        self.pointer_click_image = self._load("Art", "pointer2.png")
+        self.pointer_wolf_image = self._load("Art", "pointer3.png")
         self.music_path = os.path.join(self.base_dir, "Hidden", "geoffharvey-farmyard-fun-374610.ogg")
 
     def _load(self, *parts):
@@ -55,3 +58,12 @@ class ImageStore:
 
     def get_hay_bale_image(self):
         return self.hay_bale_image
+
+    def get_pointer_image(self):
+        return self.pointer_image
+
+    def get_pointer_click_image(self):
+        return self.pointer_click_image
+
+    def get_pointer_wolf_image(self):
+        return self.pointer_wolf_image
