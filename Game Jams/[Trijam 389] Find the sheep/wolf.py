@@ -16,6 +16,7 @@ class Wolf:
         else:
             self.direction = -1
         self.speed = 1
+        self.slow_speed = 0.2
         self.set_edge_limits()
         
         
@@ -43,9 +44,9 @@ class Wolf:
                 self.pos = (self.pos[0], randint(100, 500))
              movement_speed = self.speed
              if self.direction > 0 and self.pos[0] < 40:
-                 movement_speed = self.speed * 0.5
+                 movement_speed = self.slow_speed
              elif self.direction < 0 and self.pos[0] > (self.screen_width - 40):
-                 movement_speed = self.speed * 0.5
+                 movement_speed = self.slow_speed
 
              self.pos = (self.direction * movement_speed + self.pos[0], self.pos[1])
         

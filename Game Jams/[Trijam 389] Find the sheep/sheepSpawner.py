@@ -29,9 +29,25 @@ class SheepSpawner:
     def get_random_sheep_pos(self) -> tuple:
         x_min, x_max = self.menu_exclusion_zone[0]
         y_min, y_max = self.menu_exclusion_zone[1]
+        edge_margin = 40
 
         while True:
-            pos = (randrange(self.width - 40), randrange(self.height - 40))
+            spawn_min_x = edge_margin
+            spawn_max_x = self.width - edge_margin
+            spawn_min_y = edge_margin
+            spawn_max_y = self.height - edge_margin
+
+            if spawn_max_x <= spawn_min_x:
+                x = self.width // 2
+            else:
+                x = randrange(spawn_min_x, spawn_max_x)
+
+            if spawn_max_y <= spawn_min_y:
+                y = self.height // 2
+            else:
+                y = randrange(spawn_min_y, spawn_max_y)
+
+            pos = (x, y)
             if x_min < pos[0] < x_max and y_min < pos[1] < y_max:
                 continue
             return pos
