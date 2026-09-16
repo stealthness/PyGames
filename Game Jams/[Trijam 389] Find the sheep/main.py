@@ -21,8 +21,6 @@ backgrounds = images.get_backgrounds()
 music_path = images.music_path
 
 # Global game state
-flock = []
-pack = []
 menuManager = MenuManager(screen, timer_seconds=TIMER_SECONDS)
 
 # --------------------------------------------------
@@ -33,7 +31,7 @@ menuManager = MenuManager(screen, timer_seconds=TIMER_SECONDS)
 async def main():
     """Main async game loop."""
     game_status = "menu"
-    game = Game(screen, images, flock, pack, music_path)
+    game = Game(screen, images, music_path)
     running = True
     
     while running:

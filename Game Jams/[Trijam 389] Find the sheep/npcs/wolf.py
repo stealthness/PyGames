@@ -1,5 +1,9 @@
 from random import randint
 import pygame
+from core.config import (
+    START_WOLF_SPEED,
+    NORMAL_WOLF_SPEED,
+)
 
 class Wolf:
     """
@@ -15,8 +19,8 @@ class Wolf:
             self.direction = 1
         else:
             self.direction = -1
-        self.speed = 1
-        self.slow_speed = 0.2
+        self.speed = NORMAL_WOLF_SPEED
+        self.slow_speed = START_WOLF_SPEED
         self.set_edge_limits()
         
         
