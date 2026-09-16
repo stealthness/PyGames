@@ -4,6 +4,7 @@ from random import randint
 
 from managers.musicManager import MusicManager
 from managers.menuManager import MenuManager
+from core.image_store import ImageStore
 from npcs.hayBale import HayBale
 from npcs.sheepSpawner import SheepSpawner
 from npcs.wolfSpawner import WolfSpawner
@@ -17,11 +18,12 @@ from core.config import (
 class Game:
     """Main game class managing game state and logic."""
     
-    def __init__(self, screen, backgrounds, flock, pack, music_path):
+    def __init__(self, screen, images: ImageStore, flock, pack, music_path):
         self.screen = screen
-        self.background = backgrounds[0]
-        self.next_level_background = backgrounds[1]
-        self.game_over_background = backgrounds[2]
+        self.images = images
+        self.background = images.backgrounds[0]
+        self.next_level_background = images.backgrounds[1]
+        self.game_over_background = images.backgrounds[2]
         self.flock = flock
         self.wolf_pack = pack
         self.hay_bales = []
@@ -30,8 +32,8 @@ class Game:
         self.level = 1
         self.width = screen.get_width()
         self.height = screen.get_height()
-        self.shep_spawner = SheepSpawner(self.width, self.height, MENU_EXCLUSION_ZONE)
-        self.wolf_spawner = WolfSpawner(self.width, self.height)
+        self.shep_spawner = SheepSpawner(self.width, self.height, MENU_EXCLUSION_ZONE, self.images)
+        self.wolf_spawner = WolfSpawner(self.width, self.height, self.images)
         self.score = 0
         self.strikes = 0
         
@@ -50,7 +52,7 @@ class Game:
         self.flock.extend(self.shep_spawner.spawn(level))
         self.wolf_pack.extend(self.wolf_spawner.spawn(level))
         for _ in range(level):
-            self.hay_bales.append(HayBale(self.shep_spawner.get_random_sheep_pos()))
+            self.hay_bales.append(HayBale(self.shep_spawner.get_random_sheep_pos(), self.images.get_hay_bale_image()))
         
         # Reset sick sheep timers
         self.next_sick_delay = randint(SICK_SHEEP_DELAY_MIN, SICK_SHEEP_DELAY_MAX)

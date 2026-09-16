@@ -1,9 +1,9 @@
 import asyncio
-import os
 import pygame
 
 from core.game import Game
 from managers.menuManager import MenuManager
+from core.image_store import ImageStore
 from core.path_utils import get_base_dir
 from core.config import WIDTH, HEIGHT, FPS, TITLE, TIMER_SECONDS
 
@@ -12,25 +12,13 @@ from core.config import WIDTH, HEIGHT, FPS, TITLE, TIMER_SECONDS
 # --------------------------------------------------
 
 BASE_DIR = get_base_dir(False)
-background_path = os.path.join(BASE_DIR, "Art", "background.png")
-menu_background_path = os.path.join(BASE_DIR, "Art", "menu_background.png")
-game_over_background_path = os.path.join(BASE_DIR, "Art", "game_over_background.png")
-next_level_background_path = os.path.join(BASE_DIR, "Art", "next_level_background.png")
-music_path = os.path.join(BASE_DIR, "Hidden", "geoffharvey-farmyard-fun-374610.ogg")
-background_paths = [background_path, next_level_background_path, game_over_background_path, menu_background_path]
-backgrounds = []
-
-for path in background_paths:
-    try:
-        backgrounds.append(pygame.image.load(path))
-    except (FileNotFoundError, pygame.error):
-        pass
-
-
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption(TITLE)
 clock = pygame.time.Clock()
+images = ImageStore(BASE_DIR)
+backgrounds = images.get_backgrounds()
+music_path = images.music_path
 
 # Global game state
 flock = []
@@ -45,7 +33,7 @@ menuManager = MenuManager(screen, timer_seconds=TIMER_SECONDS)
 async def main():
     """Main async game loop."""
     game_status = "menu"
-    game = Game(screen, backgrounds, flock, pack, music_path)
+    game = Game(screen, images, flock, pack, music_path)
     running = True
     
     while running:

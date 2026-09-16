@@ -1,17 +1,17 @@
-import os
 from random import randint
-
-from core.path_utils import get_base_dir
 
 import pygame
 
 
 class Sheep:
-    def __init__(self, position, image_path=None, sick_image_path=None, blaa_sounds=None, dead_image_path=None):
+    def __init__(self, position, image, sick_image, dead_image, blaa_sounds=None):
         self.pos = position
         self.isFound = False
         self.color = (240, 255, 255)
-        self.load_image(image_path, sick_image_path, dead_image_path)
+        self.image = image
+        self.sick_image = sick_image
+        self.dead_image = dead_image
+        self.rect = self.image.get_rect(topleft=self.pos)
         self.isSick = False
         self.blaa_sounds = blaa_sounds
         self.isDead = False
@@ -65,23 +65,3 @@ class Sheep:
         
     def get_rect(self):
         return self.rect
-
-    def load_image(self, image_path, sick_image_path, dead_image_path):
-        # Resolve image paths relative to this script when not explicitly provided
-        if image_path is None or sick_image_path is None:
-            random_sheep = randint(1, 3)
-            base_dir = get_base_dir()
-            if image_path is None:
-                image_path = os.path.join(base_dir, "Art", f"Sheep{random_sheep}.png")
-            if sick_image_path is None:
-                sick_image_path = os.path.join(base_dir, "Art", f"SickSheep{random_sheep}.png")
-        if dead_image_path is None:
-            base_dir = get_base_dir()
-            dead_image_path = os.path.join(base_dir, "Art", "SheepDead1.png")
-
-        self.image = pygame.image.load(image_path).convert_alpha()
-        self.sick_image = pygame.image.load(sick_image_path).convert_alpha()
-        self.dead_image = pygame.image.load(dead_image_path).convert_alpha()
-
-        # Ensure we always have a rect to position the sprite
-        self.rect = self.image.get_rect(topleft=self.pos)
