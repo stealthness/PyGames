@@ -6,7 +6,7 @@ TITLE = "Find the Sheep"
 
 # Game Parameters
 TIMER_SECONDS = 30
-MAX_STRIKES = 20
+MAX_STRIKES = 10
 STARTING_SHEEP_COUNT = 5
 DIFFICULTY_SCALING = 3  # sheep per level
 STARTING_WOLF_COUNT = 1

@@ -132,7 +132,7 @@ class Game:
             self.update_sick_sheep()
             
             # Update wolf appearance
-            self.update_wolf_pack()
+            self.strikes += self.update_wolf_pack()
             
             # Draw all sheep and UI
             for sheep in self.flock:
@@ -192,7 +192,7 @@ class Game:
             pygame.display.flip()
             await asyncio.sleep(0)
 
-    def update_wolf_pack(self):
+    def update_wolf_pack(self) -> int:
         active_wolf_count = 0
         for wolf in self.wolf_pack:
             if wolf.is_active:
@@ -200,7 +200,10 @@ class Game:
         
         if active_wolf_count == 0:
             self.wolf_pack[0].activate((0,0))
-        
+        active_pack_sheep_eaton_count = 0
         for wolf in self.wolf_pack:
             if wolf.is_active:
                 wolf.update()
+                active_pack_sheep_eaton_count = wolf.check_sheep_collision(self.flock)
+        
+        return active_pack_sheep_eaton_count

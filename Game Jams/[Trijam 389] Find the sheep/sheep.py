@@ -61,7 +61,7 @@ class Sheep:
         self.die()
         
     def get_rect(self):
-        return self.image.get_rect()
+        return self.rect
 
     def load_image(self, image_path, sick_image_path):
         # Resolve image path relative to this script

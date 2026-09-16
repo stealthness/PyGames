@@ -52,10 +52,21 @@ class Wolf:
 
              self.pos = (self.direction * self.speed + self.pos[0], self.pos[1])
         
-    def check_sheep_collision(self, flock):
-        for sheep in flock.sheep:
-            if self.wolf_image.get_rect().colliderect(sheep.get_rect()):
+    def check_sheep_collision(self, flock) -> int:
+        
+              
+        if not self.is_active:
+            return
+
+        eaton_count = 0
+        
+        wolf_rect = self.wolf_image.get_rect(topleft=self.pos)
+        for sheep in flock:
+            if sheep.is_active() and wolf_rect.colliderect(sheep.get_rect()):
                 sheep.is_eaton()
+                eaton_count += 1
+        return eaton_count
+                
             
                 
     def activate(self, position):
