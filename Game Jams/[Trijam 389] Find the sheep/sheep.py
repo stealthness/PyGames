@@ -80,45 +80,9 @@ class Sheep:
             base_dir = get_base_dir()
             dead_image_path = os.path.join(base_dir, "Art", "SheepDead1.png")
 
-        # Load normal image
-        if image_path and os.path.exists(image_path):
-            self.image = pygame.image.load(image_path).convert_alpha()
-        else:
-            self.image = None
-
-        # Load sick image, otherwise create tinted fallback from normal image
-        if sick_image_path and os.path.exists(sick_image_path):
-            self.sick_image = pygame.image.load(sick_image_path).convert_alpha()
-        elif self.image is not None:
-            self.sick_image = self.image.copy()
-            tint = pygame.Surface(self.sick_image.get_size(), pygame.SRCALPHA)
-            tint.fill((0, 160, 0, 90))
-            self.sick_image.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
-        else:
-            self.sick_image = None
-
-        # Load dead image, otherwise create tinted fallback from normal image
-        if dead_image_path and os.path.exists(dead_image_path):
-            self.dead_image = pygame.image.load(dead_image_path).convert_alpha()
-        elif self.image is not None:
-            self.dead_image = self.image.copy()
-            tint = pygame.Surface(self.dead_image.get_size(), pygame.SRCALPHA)
-            tint.fill((110, 110, 110, 120))
-            self.dead_image.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-        else:
-            self.dead_image = None
-
-        # If normal image is unavailable, create a simple fallback surface
-        if self.image is None:
-            self.image = pygame.Surface((40, 40), pygame.SRCALPHA)
-            pygame.draw.ellipse(self.image, self.color, self.image.get_rect())
-            pygame.draw.ellipse(self.image, (0, 0, 0), self.image.get_rect(), width=2)
-
-        # Ensure sick/dead image always exist
-        if self.sick_image is None:
-            self.sick_image = self.image.copy()
-        if self.dead_image is None:
-            self.dead_image = self.image.copy()
+        self.image = pygame.image.load(image_path).convert_alpha()
+        self.sick_image = pygame.image.load(sick_image_path).convert_alpha()
+        self.dead_image = pygame.image.load(dead_image_path).convert_alpha()
 
         # Ensure we always have a rect to position the sprite
         self.rect = self.image.get_rect(topleft=self.pos)
