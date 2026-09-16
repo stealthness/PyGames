@@ -14,6 +14,9 @@ from config import WIDTH, HEIGHT, FPS, TITLE, TIMER_SECONDS
 
 BASE_DIR = get_base_dir(False)
 background_path = os.path.join(BASE_DIR, "Art", "background.png")
+menu_background_path = os.path.join(BASE_DIR, "Art", "menu_background.png")
+game_over_background_path = os.path.join(BASE_DIR, "Art", "game_over_background.png")
+next_level_background_path = os.path.join(BASE_DIR, "Art", "next_level_background.png")
 music_path = os.path.join(BASE_DIR, "Hidden", "geoffharvey-farmyard-fun-374610.ogg")
 
 # Try to load background, handle missing file gracefully
@@ -22,6 +25,26 @@ try:
 except (FileNotFoundError, pygame.error):
     print(f"Warning: Could not load background from {background_path}")
     background = None
+
+# Try to load menu_background, handle missing file gracefully
+try:
+    menu_background = pygame.image.load(menu_background_path)
+except (FileNotFoundError, pygame.error):
+    print(f"Warning: Could not load background from {menu_background_path}")
+    background = None
+    
+# Try to load menu_background, handle missing file gracefully
+try:
+    game_over_background = pygame.image.load(game_over_background_path)
+except (FileNotFoundError, pygame.error):
+    print(f"Warning: Could not load background from {game_over_background_path}")
+    background = None
+    # Try to load menu_background, handle missing file gracefully
+try:
+    next_level_background = pygame.image.load(next_level_background_path)
+except (FileNotFoundError, pygame.error):
+    print(f"Warning: Could not load background from {next_level_background_path}")
+    next_level_background = None
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -41,13 +64,14 @@ menuManager = MenuManager(screen, timer_seconds=TIMER_SECONDS)
 async def main():
     """Main async game loop."""
     game_status = "menu"
-    game = Game(screen, background, flock, pack, music_path)
+    backgrounds = [background, next_level_background, game_over_background]
+    game = Game(screen, backgrounds, flock, pack, music_path)
     running = True
     
     while running:
         # Menu state
         if game_status == "menu":
-            game_status = StartMenu.run_start_menu()
+            game_status = StartMenu.run_start_menu(menu_background)
             if game_status == "quit":
                 running = False
             await asyncio.sleep(0)
@@ -95,10 +119,10 @@ class StartMenu:
     """Handles the start menu display and input."""
     
     @staticmethod
-    def run_start_menu() -> str:
+    def run_start_menu(image) -> str:
         """Show start menu and return next game status."""
-        screen.fill((100, 200, 200))
-        continue_rect = menuManager.show_start_menu()
+        screen.blit(image, (0, 0))
+        continue_rect = menuManager.show_start_menu(image)
         pygame.display.flip()
         
         for event in pygame.event.get():

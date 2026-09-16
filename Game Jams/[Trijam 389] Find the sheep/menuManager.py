@@ -1,6 +1,8 @@
 from typing import Self
 
 import pygame
+from pygame import color
+
 
 class MenuConfig:
     WHITE = (255, 255, 255)
@@ -21,12 +23,13 @@ class MenuManager:
         
     
     
-    def show_end_level(self, score, level):
+    def show_end_level(self, image, score, level):
         """
         Draw the end-of-level screen and a Continue button.
         Returns the pygame.Rect of the Continue button so caller can detect clicks.
         """
-        self.screen.fill((223, 237, 149))
+        print('next level')
+        self.screen.blit(image, (0,0))
         
         # Draw title and score using refactored helper
         MenuManager.create_text_at(self.screen,
@@ -44,16 +47,21 @@ class MenuManager:
         btn_rect = MenuManager.create_btn_at(self.screen,
                                              "Continue",
                                              self.font,
-                                             (0, -100),
+                                             (-200, -100),
                                              22)
         return btn_rect
         
-    def show_end_screen(self, score, reason="You were bad"):
-        self.screen.fill((200, 100, 100))
-        end_text = f"Game Over\n{reason}\nYour score is {score}"
-        end_surf = self.font.render(end_text, True, MenuConfig.RED)
-        end_rect = end_surf.get_rect(center=(self.width // 2, self.height // 2))
-        self.screen.blit(end_surf, end_rect)
+    def show_end_screen(self, image, score, reason="You were bad"):
+        if image is None:
+            self.screen.fill((200, 100, 100))
+        else:
+            self.screen.blit(image, (0,0)) 
+            
+        MenuManager.create_text_at(self.screen, "GAME OVER", self.font, (200, 200), 80, text_color=MenuConfig.RED)
+        MenuManager.create_text_at(self.screen, reason, self.font, (-100, 0), 40)
+        MenuManager.create_text_at(self.screen, "Press space to continue", self.font, (-100, -100), 40)
+        
+
         
         
     def _draw_text_with_shadow(self, text, pos, color=MenuConfig.WHITE, shadow_offset=(1, 2)):
@@ -85,31 +93,32 @@ class MenuManager:
         """Draw score in top-left with shadow."""
         self._draw_text_with_shadow(f"deaths:{deaths}", ("midtop", (self.width -90, 10)))
     
-    def show_start_menu(self):
+    def show_start_menu(self, image):
         """
     Draw the end-of-level screen and a Continue button.
     Returns the pygame.Rect of the Continue button so caller can detect clicks.
     """
-        self.screen.fill((223, 237, 149))
+        #self.screen.fill((223, 237, 149))
+        self.screen.blit(image, (0,0))
         # Draw two lines: title and score
-        MenuManager.create_text_at(self.screen,
-                                   f"Find the Sheep",
-                                   self.font,
-                                   (0, 120),
-                                   50)
+        # MenuManager.create_text_at(self.screen,
+        #                            f"Find the Sheep",
+        #                            self.font,
+        #                            (0, 120),
+        #                            50)
 
 
         MenuManager.create_text_at(self.screen,
-                                   f"Your  job is to find all the lost sheep\nWatchout for sick sheep\nPress space to start",
+                                   f"Your  job is to find all the lost sheep, Watchout for sick sheep\nPress space to start",
                                    self.font,
-                                   (0, 0),
+                                   (200, -200),
                                    20)
 
 
         btn_rect = MenuManager.create_btn_at(self.screen,
                                              "continue",
                                              self.font,
-                                             (0, -120),
+                                             (-250, -180),
                                              30)
         return btn_rect
     
@@ -124,12 +133,13 @@ class MenuManager:
                        text, 
                        font,
                        position: tuple,
-                       font_size=20):
+                       font_size=20,
+                       text_color=MenuConfig.BLACK):
         """Draw text at screen center + offset. Position is (x_offset, y_offset)."""
         center_x = screen.get_rect().centerx
         center_y = screen.get_rect().centery
         text_font = pygame.font.SysFont("Arial", font_size)
-        text_surf = text_font.render(text, True, MenuConfig.BLACK)
+        text_surf = text_font.render(text, True, text_color)
         text_rect = text_surf.get_rect(center=(center_x - position[0], center_y - position[1]))
         screen.blit(text_surf, text_rect)
         
@@ -147,7 +157,7 @@ class MenuManager:
         
         # Draw button with size and position
         btn_w, btn_h = 220, 48
-        btn_x = center_x - btn_w // 2
+        btn_x = center_x - position[0]
         btn_y = center_y - position[1]
         btn_rect = pygame.Rect(btn_x, btn_y, btn_w, btn_h)
         

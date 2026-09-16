@@ -28,7 +28,7 @@ class Sheep:
     
     def is_active(self):
         return not self.isFound and not self.isDead
-
+ 
     def draw(self, screen) -> None:
         """
         This method draws a sheep to the screen. If a sheep is found, then no sheep is drawn. If sheep is sick the sick sheep image is drawn

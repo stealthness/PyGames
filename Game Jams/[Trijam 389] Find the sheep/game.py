@@ -1,6 +1,7 @@
 import asyncio
 import pygame
 from random import randint, randrange
+
 from musicManager import MusicManager
 from menuManager import MenuManager
 from sheep import Sheep
@@ -15,9 +16,11 @@ from config import (
 class Game:
     """Main game class managing game state and logic."""
     
-    def __init__(self, screen, background, flock, pack, music_path):
+    def __init__(self, screen, backgrounds, flock, pack, music_path):
         self.screen = screen
-        self.background = background
+        self.background = backgrounds[0]
+        self.next_level_background = backgrounds[1]
+        self.game_over_background = backgrounds[2]
         self.flock = flock
         self.wolf_pack = pack
         self.musicManager = MusicManager(music_path)
@@ -142,18 +145,19 @@ class Game:
             
             # Check if game over
             if self.check_game_over(remaining):
+                self.screen.blit(self.game_over_background, (0, 0))
                 self.musicManager.stop_music()
                 if self.strikes >= MAX_STRIKES:
-                    self.menuManager.show_end_screen(self.score, "You lost too many sheep")
+                    self.menuManager.show_end_screen(self.game_over_background, self.score, "You lost too many sheep")
                 else:
-                    self.menuManager.show_end_screen(self.score, "You took too long\nto find the sheep\npress space to restart")
+                    self.menuManager.show_end_screen(self.game_over_background, self.score, "You took too long to find the Sheep")
                 pygame.display.flip()
                 return "game_over"
             
             # Check if all sheep found
             all_found = all(sheep.isFound or sheep.isDead for sheep in self.flock)
             if all_found:
-                continue_rect = self.menuManager.show_end_level(self.score, self.level)
+                continue_rect = self.menuManager.show_end_level(self.next_level_background, self.score, self.level)
                 self.musicManager.stop_music()
                 pygame.display.flip()
                 
