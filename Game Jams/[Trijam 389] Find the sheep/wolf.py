@@ -56,7 +56,7 @@ class Wolf:
         
               
         if not self.is_active:
-            return
+            return 0
 
         eaton_count = 0
         

@@ -8,11 +8,11 @@ import pygame
 
 
 class Sheep:
-    def __init__(self, position, image_path=None, sick_image_path=None, blaa_sounds=None):
+    def __init__(self, position, image_path=None, sick_image_path=None, blaa_sounds=None, dead_image_path=None):
         self.pos = position
         self.isFound = False
         self.color = (240, 255, 255)
-        self.load_image(image_path, sick_image_path)
+        self.load_image(image_path, sick_image_path, dead_image_path)
         self.isSick = False
         self.blaa_sounds = blaa_sounds
         self.isDead = False
@@ -37,13 +37,17 @@ class Sheep:
         :param screen: 
         :return: None
         """
-        if self.isFound or self.isDead:
+        if self.isFound:
+            return
+        
+        if self.isDead:
+            screen.blit(self.dead_image, self.get_rect())
             return
         
         if self.isSick:
-            screen.blit(self.sick_image, self.rect)
+            screen.blit(self.sick_image, self.get_rect())
         else:
-            screen.blit(self.image, self.rect)
+            screen.blit(self.image, self.get_rect())
 
     def handle_click(self, pos)-> int:
         if self.isDead:
@@ -63,39 +67,58 @@ class Sheep:
     def get_rect(self):
         return self.rect
 
-    def load_image(self, image_path, sick_image_path):
-        # Resolve image path relative to this script
-        if image_path is None:
+    def load_image(self, image_path, sick_image_path, dead_image_path):
+        # Resolve image paths relative to this script when not explicitly provided
+        if image_path is None or sick_image_path is None:
             random_sheep = randint(1, 3)
-            # prefer actual asset names (capitalization matches files)
-            BASE_DIR = get_base_dir()
-            # image and sick image use different files in the Art folder
-            image_path = os.path.join(BASE_DIR, "Art", f"Sheep{random_sheep}.png")
-            sick_image_path = os.path.join(BASE_DIR, "Art", f"SickSheep{random_sheep}.png")
-        # If both files exist, load them. If sick image missing, fall back to a tinted copy
-        if os.path.exists(image_path):
+            base_dir = get_base_dir()
+            if image_path is None:
+                image_path = os.path.join(base_dir, "Art", f"Sheep{random_sheep}.png")
+            if sick_image_path is None:
+                sick_image_path = os.path.join(base_dir, "Art", f"SickSheep{random_sheep}.png")
+        if dead_image_path is None:
+            base_dir = get_base_dir()
+            dead_image_path = os.path.join(base_dir, "Art", "SheepDead1.png")
+
+        # Load normal image
+        if image_path and os.path.exists(image_path):
             self.image = pygame.image.load(image_path).convert_alpha()
         else:
             self.image = None
 
+        # Load sick image, otherwise create tinted fallback from normal image
         if sick_image_path and os.path.exists(sick_image_path):
             self.sick_image = pygame.image.load(sick_image_path).convert_alpha()
+        elif self.image is not None:
+            self.sick_image = self.image.copy()
+            tint = pygame.Surface(self.sick_image.get_size(), pygame.SRCALPHA)
+            tint.fill((0, 160, 0, 90))
+            self.sick_image.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
         else:
-            # if no explicit sick image, try to create one by tinting the normal image
-            if self.image is not None:
-                # create a green-tinted copy for sick appearance
-                self.sick_image = self.image.copy()
-                tint = pygame.Surface(self.sick_image.get_size(), pygame.SRCALPHA)
-                tint.fill((0, 160, 0, 90))  # semi-transparent green overlay
-                self.sick_image.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
-            else:
-                self.sick_image = None
+            self.sick_image = None
 
-        # If image(s) not available, create a simple fallback surface
+        # Load dead image, otherwise create tinted fallback from normal image
+        if dead_image_path and os.path.exists(dead_image_path):
+            self.dead_image = pygame.image.load(dead_image_path).convert_alpha()
+        elif self.image is not None:
+            self.dead_image = self.image.copy()
+            tint = pygame.Surface(self.dead_image.get_size(), pygame.SRCALPHA)
+            tint.fill((110, 110, 110, 120))
+            self.dead_image.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+        else:
+            self.dead_image = None
+
+        # If normal image is unavailable, create a simple fallback surface
         if self.image is None:
             self.image = pygame.Surface((40, 40), pygame.SRCALPHA)
             pygame.draw.ellipse(self.image, self.color, self.image.get_rect())
             pygame.draw.ellipse(self.image, (0, 0, 0), self.image.get_rect(), width=2)
+
+        # Ensure sick/dead image always exist
+        if self.sick_image is None:
+            self.sick_image = self.image.copy()
+        if self.dead_image is None:
+            self.dead_image = self.image.copy()
 
         # Ensure we always have a rect to position the sprite
         self.rect = self.image.get_rect(topleft=self.pos)

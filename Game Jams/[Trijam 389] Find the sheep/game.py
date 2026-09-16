@@ -2,6 +2,8 @@ import asyncio
 import pygame
 from random import randint, randrange
 
+from pygame.examples.cursors import image
+
 from musicManager import MusicManager
 from menuManager import MenuManager
 from sheep import Sheep
@@ -41,15 +43,29 @@ class Game:
         self.level = level
         self.musicManager.play_music()
         self.flock.clear()
+        self.wolf_pack.clear()
         sheep_count = (level - 1) * DIFFICULTY_SCALING + STARTING_SHEEP_COUNT
-        wolf_count = (level + 1) // DIFFICULTY_SCALING + STARTING_WOLF_COUNT
+        wolf_count = STARTING_WOLF_COUNT + ((level - 1) // 2)
         for _ in range(sheep_count):
             pos = self.get_random_sheep_pos()
-            self.flock.append(Sheep(pos, blaa_sounds=["Hidden/blaa1.ogg", "Hidden/blaa2.ogg", "Hidden/blaa3.ogg"]))
+            self.flock.append(Sheep(pos, image_path="Art/Sheep1.png", dead_image_path="Art/SheepDead1.png", sick_image_path="Art/SickSheep1.png",
+                                    blaa_sounds=["Hidden/blaa1.ogg", "Hidden/blaa2.ogg", "Hidden/blaa3.ogg"]))
         
-        for _ in range(wolf_count):
-            pos = (100, 100)
-            self.wolf_pack.append(Wolf(pos, "Art/wolkf1.png"))
+        min_wolf_y = 80
+        max_wolf_y = max(min_wolf_y, self.height - 80)
+        for i in range(wolf_count):
+            y = randint(min_wolf_y, max_wolf_y)
+            if i % 2 == 0:
+                pos = (-120 - (i * 80), y)
+                direction = 1
+            else:
+                pos = (self.width + (i * 80), y)
+                direction = -1
+
+            wolf = Wolf(pos, "Art/wolkf1.png")
+            wolf.direction = direction
+            wolf.activate(pos)
+            self.wolf_pack.append(wolf)
         
         # Reset sick sheep timers
         self.next_sick_delay = randint(SICK_SHEEP_DELAY_MIN, SICK_SHEEP_DELAY_MAX)
@@ -193,17 +209,10 @@ class Game:
             await asyncio.sleep(0)
 
     def update_wolf_pack(self) -> int:
-        active_wolf_count = 0
-        for wolf in self.wolf_pack:
-            if wolf.is_active:
-                active_wolf_count += 1
-        
-        if active_wolf_count == 0:
-            self.wolf_pack[0].activate((0,0))
         active_pack_sheep_eaton_count = 0
         for wolf in self.wolf_pack:
             if wolf.is_active:
                 wolf.update()
-                active_pack_sheep_eaton_count = wolf.check_sheep_collision(self.flock)
+                active_pack_sheep_eaton_count += wolf.check_sheep_collision(self.flock)
         
         return active_pack_sheep_eaton_count
