@@ -1,4 +1,5 @@
 from operator import ifloordiv
+from random import random, randint
 from turtledemo.paint import switchupdown
 from typing import Self
 
@@ -23,6 +24,8 @@ class Wolf:
         else:
             self.direction = -1
         self.speed = 1
+        self.set_edge_limits()
+        
         
     def draw(self, screen):
         """
@@ -31,9 +34,8 @@ class Wolf:
         :return: 
         """
         if self.is_active:
-            
-            
-            screen.blit(self.wolf_image, (self.pos[0], self.pos[1]))
+            wolf_image = pygame.transform.flip(self.wolf_image, self.direction < 0, False)
+            screen.blit(wolf_image, (self.pos[0], self.pos[1]))
             
     def update(self):
         """
@@ -41,10 +43,30 @@ class Wolf:
         :return: 
         """
         if self.is_active:
-            self.pos = (self.direction * self.speed + self.pos[0], self.pos[1])
+             if self.pos[0] >= self.right_limit:
+                self.direction = -1
+                self.pos = (self.pos[0], randint(100, 500))
+             elif self.pos[0] <= self.left_limit:
+                self.direction = 1
+                self.pos = (self.pos[0], randint(100, 500))
+
+             self.pos = (self.direction * self.speed + self.pos[0], self.pos[1])
+        
+    def check_sheep_collision(self, flock):
+        for sheep in flock.sheep:
+            if self.wolf_image.get_rect().colliderect(sheep.get_rect()):
+                sheep.is_eaton()
             
+                
     def activate(self, position):
         self.is_active = True
         self.pos = position
+
+    def set_edge_limits(self):
+        surface = pygame.display.get_surface()
+        screen_width = surface.get_width() if surface else 1000
+        wolf_width = self.wolf_image.get_width()
+        self.right_limit = screen_width + wolf_width * 2
+        self.left_limit = -wolf_width * 2
     
         

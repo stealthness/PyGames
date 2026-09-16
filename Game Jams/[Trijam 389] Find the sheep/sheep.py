@@ -1,5 +1,7 @@
 import os
 from random import randint
+from typing import Self
+
 from path_utils import get_base_dir
 
 import pygame
@@ -54,6 +56,12 @@ class Sheep:
                 pygame.mixer.Sound(self.blaa_sounds[i]).play()
             return 1
         return 0
+
+    def is_eaton(self):
+        self.die()
+        
+    def get_rect(self):
+        return self.image.get_rect()
 
     def load_image(self, image_path, sick_image_path):
         # Resolve image path relative to this script
