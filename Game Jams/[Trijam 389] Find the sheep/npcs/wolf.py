@@ -6,6 +6,9 @@ from core.config import (
     VERTICAL_WOLF_SPEED,
     VERTICAL_SWITCH_PERCENTAGE,
     VERTICAL_SWITCH_CHANGE_DELAY,
+    WOLF_EDGE_MARGIN,
+    WOLF_VERTICAL_RESET_Y_RANGE,
+    WOLF_OFFSCREEN_MULTIPLIER,
 )
 from core.wolf_status import WolfStatus
 from npcs.wolfAnimator import WolfAnimator
@@ -57,12 +60,12 @@ class Wolf:
     def update_normal(self):
         if self.pos[0] >= self.right_limit:
             self.direction = -1
-            self.pos = (self.pos[0], randint(100, 500))
+            self.pos = (self.pos[0], randint(WOLF_VERTICAL_RESET_Y_RANGE[0], WOLF_VERTICAL_RESET_Y_RANGE[1]))
             self.vertical_direction = 0
             self.schedule_vertical_switch()
         elif self.pos[0] <= self.left_limit:
             self.direction = 1
-            self.pos = (self.pos[0], randint(100, 500))
+            self.pos = (self.pos[0], randint(WOLF_VERTICAL_RESET_Y_RANGE[0], WOLF_VERTICAL_RESET_Y_RANGE[1]))
             self.vertical_direction = 0
             self.schedule_vertical_switch()
 
@@ -72,10 +75,10 @@ class Wolf:
     def update_slow(self):
         if self.pos[0] >= self.right_limit:
             self.direction = -1
-            self.pos = (self.pos[0], randint(100, 500))
+            self.pos = (self.pos[0], randint(WOLF_VERTICAL_RESET_Y_RANGE[0], WOLF_VERTICAL_RESET_Y_RANGE[1]))
         elif self.pos[0] <= self.left_limit:
             self.direction = 1
-            self.pos = (self.pos[0], randint(100, 500))
+            self.pos = (self.pos[0], randint(WOLF_VERTICAL_RESET_Y_RANGE[0], WOLF_VERTICAL_RESET_Y_RANGE[1]))
         self.vertical_direction = 0
         self.move(self.slow_speed)
 
@@ -111,14 +114,14 @@ class Wolf:
         self.screen_width = screen_width
         self.screen_height = screen_height
         wolf_width = self.animator.get_base_width()
-        self.right_limit = screen_width + wolf_width * 2
-        self.left_limit = -wolf_width * 2
+        self.right_limit = screen_width + wolf_width * WOLF_OFFSCREEN_MULTIPLIER
+        self.left_limit = -wolf_width * WOLF_OFFSCREEN_MULTIPLIER
 
     def get_current_image(self):
         return self.animator.get_current_image(self.is_slow_zone())
 
     def is_slowing_down(self):
-        return (self.direction > 0 and self.pos[0] < 40) or (self.direction < 0 and self.pos[0] > (self.screen_width - 40))
+        return (self.direction > 0 and self.pos[0] < WOLF_EDGE_MARGIN) or (self.direction < 0 and self.pos[0] > (self.screen_width - WOLF_EDGE_MARGIN))
 
     def is_slow_zone(self):
         return self.is_slowing_down()
