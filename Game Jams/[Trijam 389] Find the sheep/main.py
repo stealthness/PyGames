@@ -18,33 +18,15 @@ menu_background_path = os.path.join(BASE_DIR, "Art", "menu_background.png")
 game_over_background_path = os.path.join(BASE_DIR, "Art", "game_over_background.png")
 next_level_background_path = os.path.join(BASE_DIR, "Art", "next_level_background.png")
 music_path = os.path.join(BASE_DIR, "Hidden", "geoffharvey-farmyard-fun-374610.ogg")
+background_paths = [background_path, next_level_background_path, game_over_background_path, menu_background_path]
+backgrounds = []
 
-# Try to load background, handle missing file gracefully
-try:
-    background = pygame.image.load(background_path)
-except (FileNotFoundError, pygame.error):
-    print(f"Warning: Could not load background from {background_path}")
-    background = None
+for path in background_paths:
+    try:
+        backgrounds.append(pygame.image.load(path))
+    except (FileNotFoundError, pygame.error):
+        print(f"Warning: Could not load background from {path}")
 
-# Try to load menu_background, handle missing file gracefully
-try:
-    menu_background = pygame.image.load(menu_background_path)
-except (FileNotFoundError, pygame.error):
-    print(f"Warning: Could not load background from {menu_background_path}")
-    background = None
-    
-# Try to load menu_background, handle missing file gracefully
-try:
-    game_over_background = pygame.image.load(game_over_background_path)
-except (FileNotFoundError, pygame.error):
-    print(f"Warning: Could not load background from {game_over_background_path}")
-    background = None
-    # Try to load menu_background, handle missing file gracefully
-try:
-    next_level_background = pygame.image.load(next_level_background_path)
-except (FileNotFoundError, pygame.error):
-    print(f"Warning: Could not load background from {next_level_background_path}")
-    next_level_background = None
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -64,14 +46,13 @@ menuManager = MenuManager(screen, timer_seconds=TIMER_SECONDS)
 async def main():
     """Main async game loop."""
     game_status = "menu"
-    backgrounds = [background, next_level_background, game_over_background]
     game = Game(screen, backgrounds, flock, pack, music_path)
     running = True
     
     while running:
         # Menu state
         if game_status == "menu":
-            game_status = StartMenu.run_start_menu(menu_background)
+            game_status = StartMenu.run_start_menu(backgrounds[3])
             if game_status == "quit":
                 running = False
             await asyncio.sleep(0)
