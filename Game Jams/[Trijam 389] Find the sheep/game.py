@@ -1,15 +1,15 @@
 import asyncio
 import pygame
-from random import randint, randrange
+from random import randint
 
 from musicManager import MusicManager
 from menuManager import MenuManager
-from sheep import Sheep
-from wolf import Wolf
+from shepSpawner import ShepSpawner
+from wolfSpawner import WolfSpawner
 from config import (
-    TIMER_SECONDS, MAX_STRIKES, STARTING_SHEEP_COUNT, DIFFICULTY_SCALING,
+    TIMER_SECONDS, MAX_STRIKES,
     SICK_SHEEP_DELAY_MIN, SICK_SHEEP_DELAY_MAX, LEVEL_TRANSITION_TIMEOUT,
-    MENU_EXCLUSION_ZONE, STARTING_WOLF_COUNT
+    MENU_EXCLUSION_ZONE
 )
 
 
@@ -28,6 +28,8 @@ class Game:
         self.level = 1
         self.width = screen.get_width()
         self.height = screen.get_height()
+        self.shep_spawner = ShepSpawner(self.width, self.height, MENU_EXCLUSION_ZONE)
+        self.wolf_spawner = WolfSpawner(self.width, self.height)
         self.score = 0
         self.strikes = 0
         
@@ -42,45 +44,14 @@ class Game:
         self.musicManager.play_music()
         self.flock.clear()
         self.wolf_pack.clear()
-        sheep_count = (level - 1) * DIFFICULTY_SCALING + STARTING_SHEEP_COUNT
-        wolf_count = STARTING_WOLF_COUNT + ((level - 1) // 2)
-        for _ in range(sheep_count):
-            pos = self.get_random_sheep_pos()
-            self.flock.append(Sheep(pos, image_path="Art/Sheep1.png", dead_image_path="Art/SheepDead1.png", sick_image_path="Art/SickSheep1.png",
-                                    blaa_sounds=["Hidden/blaa1.ogg", "Hidden/blaa2.ogg", "Hidden/blaa3.ogg"]))
-        
-        min_wolf_y = 80
-        max_wolf_y = max(min_wolf_y, self.height - 80)
-        for i in range(wolf_count):
-            y = randint(min_wolf_y, max_wolf_y)
-            if i % 2 == 0:
-                pos = (-120 - (i * 80), y)
-                direction = 1
-            else:
-                pos = (self.width + (i * 80), y)
-                direction = -1
-
-            wolf = Wolf(pos, "Art/wolkf1.png")
-            wolf.direction = direction
-            wolf.activate(pos)
-            self.wolf_pack.append(wolf)
+        self.flock.extend(self.shep_spawner.spawn(level))
+        self.wolf_pack.extend(self.wolf_spawner.spawn(level))
         
         # Reset sick sheep timers
         self.next_sick_delay = randint(SICK_SHEEP_DELAY_MIN, SICK_SHEEP_DELAY_MAX)
         self.start_ticks = pygame.time.get_ticks()
         self.next_sick_timer = self.start_ticks + self.next_sick_delay
 
-    def get_random_sheep_pos(self) -> tuple:
-        """Get a random position for a sheep, avoiding exclusion zone."""
-        x_min, x_max = MENU_EXCLUSION_ZONE[0]
-        y_min, y_max = MENU_EXCLUSION_ZONE[1]
-        
-        while True:
-            pos = (randrange(self.width - 40), randrange(self.height - 40))
-            if x_min < pos[0] < x_max and y_min < pos[1] < y_max:
-                continue
-            return pos
-    
     def check_game_over(self, remaining: int) -> bool:
         """Check if game should end."""
         return remaining <= 0 or self.strikes >= MAX_STRIKES
