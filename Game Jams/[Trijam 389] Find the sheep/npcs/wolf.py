@@ -1,8 +1,13 @@
-from random import randint
+from random import randint, random
 import pygame
 from core.config import (
     START_WOLF_SPEED,
     NORMAL_WOLF_SPEED,
+    WOLF_ANIMATION_RATE_MS,
+    WOLF_SLOW_ANIMATION_RATE_MS,
+    VERTICAL_WOLF_SPEED,
+    VERTICAL_SWITCH_PERCENTAGE,
+    VERTICAL_SWITCH_CHANGE_DELAY,
 )
 
 class Wolf:
@@ -10,17 +15,24 @@ class Wolf:
     This class represents a wolf on the screen. it starts from just outside the left or right of the screen and will move
     across horizontally and kill any sheep it touches
     """
-    def __init__(self, pos = (-300, 200), wolf_image=None):
+    def __init__(self, pos = (-300, 200), wolf_frames=None):
         self.is_active = False
         self.hit_points = 3
         self.pos = pos
-        self.wolf_image = wolf_image
+        self.wolf_frames = wolf_frames or []
         if pos[0] > 0:
             self.direction = 1
         else:
             self.direction = -1
         self.speed = NORMAL_WOLF_SPEED
         self.slow_speed = START_WOLF_SPEED
+        self.animation_rate_ms = WOLF_ANIMATION_RATE_MS
+        self.slow_animation_rate_ms = WOLF_SLOW_ANIMATION_RATE_MS
+        self.animation_start_ticks = pygame.time.get_ticks()
+        self.animation_frame_offset = randint(0, 3)
+        self.vertical_speed = VERTICAL_WOLF_SPEED
+        self.vertical_direction = 0
+        self.next_vertical_switch_ticks = 0
         self.set_edge_limits()
         
         
@@ -31,7 +43,8 @@ class Wolf:
         :return: 
         """
         if self.is_active:
-            wolf_image = pygame.transform.flip(self.wolf_image, self.direction < 0, False)
+            wolf_image = self.get_current_image()
+            wolf_image = pygame.transform.flip(wolf_image, self.direction < 0, False)
             screen.blit(wolf_image, (int(self.pos[0]), int(self.pos[1])))
             
     def update(self):
@@ -40,29 +53,38 @@ class Wolf:
         :return: 
         """
         if self.is_active:
-             if self.pos[0] >= self.right_limit:
+            if self.pos[0] >= self.right_limit:
                 self.direction = -1
                 self.pos = (self.pos[0], randint(100, 500))
-             elif self.pos[0] <= self.left_limit:
+                self.vertical_direction = 0
+                self.schedule_vertical_switch()
+            elif self.pos[0] <= self.left_limit:
                 self.direction = 1
                 self.pos = (self.pos[0], randint(100, 500))
-             movement_speed = self.speed
-             if self.direction > 0 and self.pos[0] < 40:
-                 movement_speed = self.slow_speed
-             elif self.direction < 0 and self.pos[0] > (self.screen_width - 40):
-                 movement_speed = self.slow_speed
+                self.vertical_direction = 0
+                self.schedule_vertical_switch()
+            movement_speed = self.speed
+            if self.direction > 0 and self.pos[0] < 40:
+                movement_speed = self.slow_speed
+            elif self.direction < 0 and self.pos[0] > (self.screen_width - 40):
+                movement_speed = self.slow_speed
 
-             self.pos = (self.direction * movement_speed + self.pos[0], self.pos[1])
+            if not self.is_slow_zone():
+                self.update_vertical_direction()
+            else:
+                self.vertical_direction = 0
+
+            x = self.direction * movement_speed + self.pos[0]
+            y = self.pos[1] + (self.vertical_direction * self.vertical_speed)
+            y = self.clamp_vertical_position(y)
+            self.pos = (x, y)
         
     def check_sheep_collision(self, flock) -> int:
-        
-              
         if not self.is_active:
             return 0
 
         eaton_count = 0
-        
-        wolf_rect = self.wolf_image.get_rect(topleft=(int(self.pos[0]), int(self.pos[1])))
+        wolf_rect = self.get_current_image().get_rect(topleft=(int(self.pos[0]), int(self.pos[1])))
         for sheep in flock:
             if sheep.is_active() and wolf_rect.colliderect(sheep.get_rect()):
                 sheep.is_eaton()
@@ -74,13 +96,58 @@ class Wolf:
     def activate(self, position):
         self.is_active = True
         self.pos = position
+        self.schedule_vertical_switch()
 
     def set_edge_limits(self):
         surface = pygame.display.get_surface()
         screen_width = surface.get_width() if surface else 1000
+        screen_height = surface.get_height() if surface else 1000
         self.screen_width = screen_width
-        wolf_width = self.wolf_image.get_width()
+        self.screen_height = screen_height
+        wolf_width = self.get_current_image().get_width()
         self.right_limit = screen_width + wolf_width * 2
         self.left_limit = -wolf_width * 2
+
+    def get_current_image(self):
+        if not self.wolf_frames:
+            return pygame.Surface((1, 1), pygame.SRCALPHA)
+        elapsed = pygame.time.get_ticks() - self.animation_start_ticks
+        rate = self.slow_animation_rate_ms if self.is_slowing_down() else self.animation_rate_ms
+        frame_index = ((elapsed // rate) + self.animation_frame_offset) % len(self.wolf_frames)
+        return self.wolf_frames[frame_index]
+
+    def is_slowing_down(self):
+        return (self.direction > 0 and self.pos[0] < 40) or (self.direction < 0 and self.pos[0] > (self.screen_width - 40))
+
+    def is_slow_zone(self):
+        return self.is_slowing_down()
+
+    def schedule_vertical_switch(self):
+        delay_seconds = randint(VERTICAL_SWITCH_CHANGE_DELAY[0], VERTICAL_SWITCH_CHANGE_DELAY[1])
+        self.next_vertical_switch_ticks = pygame.time.get_ticks() + (delay_seconds * 1000)
+
+    def update_vertical_direction(self):
+        current_ticks = pygame.time.get_ticks()
+        if current_ticks < self.next_vertical_switch_ticks:
+            return
+
+        self.schedule_vertical_switch()
+        if random() < VERTICAL_SWITCH_PERCENTAGE:
+            self.vertical_direction = 0
+            return
+
+        self.vertical_direction = -1 if randint(0, 1) == 0 else 1
+
+    def clamp_vertical_position(self, y):
+        image_height = self.get_current_image().get_height()
+        min_y = 0
+        max_y = max(0, self.screen_height - image_height)
+        if y < min_y:
+            self.vertical_direction = 1
+            return min_y
+        if y > max_y:
+            self.vertical_direction = -1
+            return max_y
+        return y
     
         

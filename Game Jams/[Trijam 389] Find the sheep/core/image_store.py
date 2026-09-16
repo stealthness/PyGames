@@ -25,10 +25,10 @@ class ImageStore:
         ]
         self.dead_sheep_image = self._load("Art", "SheepDead1.png")
         self.wolf_images = [
-            self._load("Art", "wolkf1.png"),
-            self._load("Art", "wolkf2.png"),
-            self._load("Art", "wolkf3.png"),
-            self._load("Art", "wolkf4.png"),
+            self._load("Art", "wolf1.png"),
+            self._load("Art", "wolf2.png"),
+            self._load("Art", "wolf3.png"),
+            self._load("Art", "wolf4.png"),
         ]
         self.hay_bale_image = self._load("Art", "HayBale1.png")
         self.music_path = os.path.join(self.base_dir, "Hidden", "geoffharvey-farmyard-fun-374610.ogg")
@@ -49,6 +49,9 @@ class ImageStore:
 
     def get_random_wolf_image(self):
         return self.wolf_images[randint(0, len(self.wolf_images) - 1)]
+
+    def get_wolf_frames(self):
+        return self.wolf_images
 
     def get_hay_bale_image(self):
         return self.hay_bale_image

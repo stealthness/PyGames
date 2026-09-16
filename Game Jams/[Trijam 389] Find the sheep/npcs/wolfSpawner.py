@@ -26,7 +26,7 @@ class WolfSpawner:
                 pos = (self.width + (i * 80), y)
                 direction = -1
 
-            wolf = Wolf(pos, self.images.get_random_wolf_image())
+            wolf = Wolf(pos, self.images.get_wolf_frames())
             wolf.direction = direction
             wolf.activate(pos)
             pack.append(wolf)
