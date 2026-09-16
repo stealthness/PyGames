@@ -3,6 +3,7 @@ import pygame
 
 from core.game import Game
 from managers.menuManager import MenuManager
+from managers.startMenu import StartMenu
 from core.image_store import ImageStore
 from core.path_utils import get_base_dir
 from core.config import WIDTH, HEIGHT, FPS, TITLE, TIMER_SECONDS
@@ -22,6 +23,7 @@ music_path = images.music_path
 
 # Global game state
 menuManager = MenuManager(screen, timer_seconds=TIMER_SECONDS)
+startMenu = StartMenu(screen, menuManager)
 
 # --------------------------------------------------
 # Async Game Loop
@@ -37,7 +39,7 @@ async def main():
     while running:
         # Menu state
         if game_status == "menu":
-            game_status = StartMenu.run_start_menu(backgrounds[3])
+            game_status = startMenu.run_start_menu(backgrounds[3])
             if game_status == "quit":
                 running = False
             await asyncio.sleep(0)
@@ -58,57 +60,12 @@ async def main():
             if game_status == "quit":
                 running = False
             elif game_status == "game_over":
-                game_status = await StartMenu.handle_game_over_events(game.game_over_button_rect)
+                game_status = await startMenu.handle_game_over_events(game.game_over_button_rect)
                 if game_status == "quit":
                     running = False
             continue
     
     pygame.quit()
-
-
-
-
-class StartMenu:
-    """Handles the start menu display and input."""
-
-    @staticmethod
-    async def handle_game_over_events(button_rect) -> str:
-        """Wait for input on the game-over screen and return the next state."""
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    return "quit"
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        return "quit"
-                    if event.key == pygame.K_SPACE:
-                        return "menu"
-                if event.type == pygame.MOUSEBUTTONDOWN and button_rect is not None:
-                    if button_rect.collidepoint(event.pos):
-                        return "menu"
-            pygame.display.flip()
-            await asyncio.sleep(0.05)
-    
-    @staticmethod
-    def run_start_menu(image) -> str:
-        """Show start menu and return next game status."""
-        screen.blit(image, (0, 0))
-        continue_rect = menuManager.show_start_menu(image)
-        pygame.display.flip()
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return "quit"
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    return "quit"
-                if event.key == pygame.K_SPACE:
-                    return "init_game"
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if continue_rect.collidepoint(event.pos):
-                    return "init_game"
-        
-        return "menu"
 
 
 
