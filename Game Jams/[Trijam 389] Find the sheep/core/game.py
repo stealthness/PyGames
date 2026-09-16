@@ -29,6 +29,7 @@ class Game:
         self.level = 1
         self.width = screen.get_width()
         self.height = screen.get_height()
+        self.game_over_button_rect = None
         self.score = 0
         self.strikes = 0
         self.start_ticks = pygame.time.get_ticks()
@@ -101,9 +102,9 @@ class Game:
                 self.screen.blit(self.game_over_background, (0, 0))
                 self.musicManager.stop_music()
                 if self.strikes >= MAX_STRIKES:
-                    self.menuManager.show_end_screen(self.game_over_background, self.score, "You lost too many sheep")
+                    self.game_over_button_rect = self.menuManager.show_end_screen(self.game_over_background, self.score, "You lost too many sheep")
                 else:
-                    self.menuManager.show_end_screen(self.game_over_background, self.score, "You took too long to find the Sheep")
+                    self.game_over_button_rect = self.menuManager.show_end_screen(self.game_over_background, self.score, "You took too long to find the Sheep")
                 pygame.display.flip()
                 return "game_over"
             

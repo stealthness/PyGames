@@ -55,7 +55,12 @@ class MenuManager:
             
         MenuManager.create_text_at(self.screen, "GAME OVER", self.font, (200, 200), 80, text_color=MenuConfig.RED)
         MenuManager.create_text_at(self.screen, reason, self.font, (-100, 0), 40)
-        MenuManager.create_text_at(self.screen, "Press space to continue", self.font, (-100, -100), 40)
+        btn_rect = MenuManager.create_btn_at(self.screen,
+                                             "play again",
+                                             self.font,
+                                             (-200, -100),
+                                             22)
+        return btn_rect
         
 
         
