@@ -1,7 +1,4 @@
-from typing import Self
-
 import pygame
-from pygame import color
 
 
 class MenuConfig:

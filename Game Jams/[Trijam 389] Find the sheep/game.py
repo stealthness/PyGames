@@ -2,8 +2,6 @@ import asyncio
 import pygame
 from random import randint, randrange
 
-from pygame.examples.cursors import image
-
 from musicManager import MusicManager
 from menuManager import MenuManager
 from sheep import Sheep

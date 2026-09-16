@@ -1,13 +1,5 @@
-from operator import ifloordiv
 from random import random, randint
-from turtledemo.paint import switchupdown
-from typing import Self
-
 import pygame
-
-
-
-
 
 class Wolf:
     """
