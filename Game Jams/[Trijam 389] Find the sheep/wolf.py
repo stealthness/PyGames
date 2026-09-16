@@ -1,4 +1,4 @@
-from random import random, randint
+from random import randint
 import pygame
 
 class Wolf:
@@ -27,7 +27,7 @@ class Wolf:
         """
         if self.is_active:
             wolf_image = pygame.transform.flip(self.wolf_image, self.direction < 0, False)
-            screen.blit(wolf_image, (self.pos[0], self.pos[1]))
+            screen.blit(wolf_image, (int(self.pos[0]), int(self.pos[1])))
             
     def update(self):
         """
@@ -41,8 +41,13 @@ class Wolf:
              elif self.pos[0] <= self.left_limit:
                 self.direction = 1
                 self.pos = (self.pos[0], randint(100, 500))
+             movement_speed = self.speed
+             if self.direction > 0 and self.pos[0] < 40:
+                 movement_speed = self.speed * 0.5
+             elif self.direction < 0 and self.pos[0] > (self.screen_width - 40):
+                 movement_speed = self.speed * 0.5
 
-             self.pos = (self.direction * self.speed + self.pos[0], self.pos[1])
+             self.pos = (self.direction * movement_speed + self.pos[0], self.pos[1])
         
     def check_sheep_collision(self, flock) -> int:
         
@@ -52,7 +57,7 @@ class Wolf:
 
         eaton_count = 0
         
-        wolf_rect = self.wolf_image.get_rect(topleft=self.pos)
+        wolf_rect = self.wolf_image.get_rect(topleft=(int(self.pos[0]), int(self.pos[1])))
         for sheep in flock:
             if sheep.is_active() and wolf_rect.colliderect(sheep.get_rect()):
                 sheep.is_eaton()
@@ -68,6 +73,7 @@ class Wolf:
     def set_edge_limits(self):
         surface = pygame.display.get_surface()
         screen_width = surface.get_width() if surface else 1000
+        self.screen_width = screen_width
         wolf_width = self.wolf_image.get_width()
         self.right_limit = screen_width + wolf_width * 2
         self.left_limit = -wolf_width * 2
