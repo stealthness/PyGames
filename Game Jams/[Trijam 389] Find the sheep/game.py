@@ -4,6 +4,7 @@ from random import randint
 
 from musicManager import MusicManager
 from menuManager import MenuManager
+from hayBale import HayBale
 from sheepSpawner import SheepSpawner
 from wolfSpawner import WolfSpawner
 from config import (
@@ -23,6 +24,7 @@ class Game:
         self.game_over_background = backgrounds[2]
         self.flock = flock
         self.wolf_pack = pack
+        self.hay_bales = []
         self.musicManager = MusicManager(music_path)
         self.menuManager = MenuManager(self.screen, timer_seconds=TIMER_SECONDS)
         self.level = 1
@@ -44,8 +46,11 @@ class Game:
         self.musicManager.play_music()
         self.flock.clear()
         self.wolf_pack.clear()
+        self.hay_bales.clear()
         self.flock.extend(self.shep_spawner.spawn(level))
         self.wolf_pack.extend(self.wolf_spawner.spawn(level))
+        for _ in range(level):
+            self.hay_bales.append(HayBale(self.shep_spawner.get_random_sheep_pos()))
         
         # Reset sick sheep timers
         self.next_sick_delay = randint(SICK_SHEEP_DELAY_MIN, SICK_SHEEP_DELAY_MAX)
@@ -86,6 +91,9 @@ class Game:
         else:
             self.screen.blit(self.background, (0, 0))
 
+    def draw_ui_strip(self):
+        pygame.draw.rect(self.screen, (0, 0, 0), pygame.Rect(0, 0, self.width, 64))
+
     def handle_events(self) -> str:
         """Handle input events and return status."""
         for event in pygame.event.get():
@@ -124,6 +132,9 @@ class Game:
                 sheep.draw(self.screen)
             for wolf in self.wolf_pack:
                 wolf.draw(self.screen)
+            for hay_bale in self.hay_bales:
+                hay_bale.draw(self.screen)
+            self.draw_ui_strip()
             self.menuManager.draw_score(self.score)
             
             # Draw countdown timer

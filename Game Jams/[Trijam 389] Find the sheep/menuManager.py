@@ -25,7 +25,6 @@ class MenuManager:
         Draw the end-of-level screen and a Continue button.
         Returns the pygame.Rect of the Continue button so caller can detect clicks.
         """
-        print('next level')
         self.screen.blit(image, (0,0))
         
         # Draw title and score using refactored helper

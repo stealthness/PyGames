@@ -24,7 +24,7 @@ for path in background_paths:
     try:
         backgrounds.append(pygame.image.load(path))
     except (FileNotFoundError, pygame.error):
-        print(f"Warning: Could not load background from {path}")
+        pass
 
 
 pygame.init()
