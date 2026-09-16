@@ -64,6 +64,9 @@ class CreatureManager:
                 strikes_added += wolf.check_sheep_collision(self.flock)
         return strikes_added
 
+    def update(self) -> int:
+        return self.update_sick_sheep() + self.update_wolves()
+
     def draw(self, screen):
         for sheep in self.flock:
             sheep.draw(screen)

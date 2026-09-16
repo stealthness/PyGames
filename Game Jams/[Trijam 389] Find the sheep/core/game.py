@@ -82,8 +82,7 @@ class Game:
             if status == "quit":
                 return "quit"
             
-            self.strikes += self.creature_manager.update_sick_sheep()
-            self.strikes += self.creature_manager.update_wolves()
+            self.strikes += self.creature_manager.update()
             
             # Draw all sheep and UI
             self.creature_manager.draw(self.screen)
