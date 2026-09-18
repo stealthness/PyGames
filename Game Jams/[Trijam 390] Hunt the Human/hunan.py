@@ -9,9 +9,14 @@ from config import (
     HUMAN_HITBOX_INSET_Y,
     HUMAN_INVULNERABILITY_FRAMES,
     HUMAN_JUMP_VELOCITY,
+    HUMAN_KEYS_CLIMB,
+    HUMAN_KEYS_HIDE,
+    HUMAN_KEYS_JUMP,
     HUMAN_MAX_FALL_SPEED,
     HUMAN_START_LIVES,
+    HUMAN_WALK_FRAME_TICKS,
     human_default_image,
+    human_walk_frames,
 )
 
 class Human:
@@ -29,6 +34,9 @@ class Human:
         self.image = human_default_image
         self.rect = self.image.get_rect()
         self.rect.midbottom = (SCREEN_WIDTH // 2, SCREEN_HEIGHT - HUMAN_BOTTOM_OFFSET)
+        self.walk_frames = human_walk_frames
+        self.walk_frame_index = 0
+        self.walk_frame_tick = 0
 
         # Core movement tuning values.
         self.gravity = HUMAN_GRAVITY
@@ -44,17 +52,22 @@ class Human:
         self.on_ground = True
         self.invulnerability_frames = 0
 
-        # Track prior key state so mode toggles happen once per key press.
-        self._previous_keys = {
-            pygame.K_SPACE: False,
-            pygame.K_UP: False,
-            pygame.K_DOWN: False,
+        # Track prior action state so toggles happen once per key press.
+        self._action_key_map = {
+            "jump": HUMAN_KEYS_JUMP,
+            "hide": HUMAN_KEYS_HIDE,
+            "climb": HUMAN_KEYS_CLIMB,
+        }
+        self._previous_actions = {
+            "jump": False,
+            "hide": False,
+            "climb": False,
         }
 
-    def _just_pressed(self, keys, key_code):
-        pressed_now = bool(keys[key_code])
-        was_pressed = self._previous_keys[key_code]
-        self._previous_keys[key_code] = pressed_now
+    def _just_pressed(self, keys, action):
+        pressed_now = any(keys[key_code] for key_code in self._action_key_map[action])
+        was_pressed = self._previous_actions[action]
+        self._previous_actions[action] = pressed_now
         return pressed_now and not was_pressed
 
     def start_jump(self):
@@ -84,6 +97,24 @@ class Human:
             self.velocity_y = 0
             self.on_ground = True
 
+    def update_animation(self):
+        if self.in_hole or self.on_tree:
+            self.walk_frame_index = 0
+            self.image = self.walk_frames[self.walk_frame_index]
+            return
+
+        self.walk_frame_tick += 1
+        if self.walk_frame_tick < HUMAN_WALK_FRAME_TICKS:
+            return
+
+        self.walk_frame_tick = 0
+        self.walk_frame_index = (self.walk_frame_index + 1) % len(self.walk_frames)
+
+        anchor = self.rect.midbottom
+        self.image = self.walk_frames[self.walk_frame_index]
+        self.rect = self.image.get_rect()
+        self.rect.midbottom = anchor
+
     def get_collision_rect(self):
         return self.rect.inflate(-HUMAN_HITBOX_INSET_X, -HUMAN_HITBOX_INSET_Y)
 
@@ -102,14 +133,15 @@ class Human:
     def update(self):
         keys = pygame.key.get_pressed()
 
-        if self._just_pressed(keys, pygame.K_SPACE):
+        if self._just_pressed(keys, "jump"):
             self.start_jump()
-        if self._just_pressed(keys, pygame.K_DOWN):
+        if self._just_pressed(keys, "hide"):
             self.toggle_hole()
-        if self._just_pressed(keys, pygame.K_UP):
+        if self._just_pressed(keys, "climb"):
             self.toggle_tree()
 
         self.apply_gravity()
+        self.update_animation()
 
         if self.invulnerability_frames > 0:
             self.invulnerability_frames -= 1

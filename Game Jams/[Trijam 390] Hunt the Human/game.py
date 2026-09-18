@@ -1,6 +1,6 @@
 import pygame
 
-from config import game_background
+from background_controller import BackgroundController
 from hunan import Human
 
 
@@ -13,7 +13,7 @@ class Game:
     
     def __init__(self, screen):
         self.screen = screen
-        self.background = game_background
+        self.background_controller = BackgroundController()
         self.human = Human()
         self.game_objects = [self.human]
         
@@ -34,6 +34,7 @@ class Game:
         this function update all game objects connect to the game class
         :return: 
         """
+        self.background_controller.update()
         for game_object in self.game_objects:
             game_object.update()
     
@@ -42,7 +43,7 @@ class Game:
         The function will draw all the game objects connect to the game class
         :return: 
         """
-        self.screen.blit(self.background, (0, 0))
+        self.background_controller.draw(self.screen)
         for game_object in self.game_objects:
             game_object.draw(self.screen)
         pygame.display.flip()
