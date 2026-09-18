@@ -1,3 +1,5 @@
+from enum import Enum
+
 import pygame
 
 from background_controller import BackgroundController
@@ -47,3 +49,10 @@ class Game:
         for game_object in self.game_objects:
             game_object.draw(self.screen)
         pygame.display.flip()
+        
+class GameStatus(Enum):
+    
+    Splash = 0,
+    Menu = 1,
+    Game = 2,
+    EndGame = 3,
