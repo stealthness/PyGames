@@ -34,7 +34,8 @@ class Game:
         this function update all game objects connect to the game class
         :return: 
         """
-        pass
+        for game_object in self.game_objects:
+            game_object.update()
     
     def draw(self):
         """
