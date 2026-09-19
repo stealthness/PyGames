@@ -22,7 +22,7 @@ HUMAN_BOTTOM_OFFSET = 60
 HUMAN_GRAVITY = 0.2
 HUMAN_JUMP_VELOCITY = -10
 HUMAN_MAX_FALL_SPEED = 6
-HUMAN_START_LIVES = 1
+HUMAN_START_LIVES = 3
 HUMAN_INVULNERABILITY_MS = 2000
 HUMAN_HITBOX_INSET_X = 12
 HUMAN_HITBOX_INSET_Y = 8
@@ -49,13 +49,17 @@ FOX_SPAWN_INTERVAL_START_MS = 5000
 FOX_SPAWN_INTERVAL_MIN_MS = 3000
 FOX_SPAWN_INTERVAL_DECREASE_MS = 50
 FOX_SPAWN_INTERVAL_VARIATION_MS = 150
+FOX_RIDING_FRAME_COUNT = 4
+FOX_RIDING_FRAME_MS = 120
 
 game_background = pygame.image.load('Hidden/Art/Backgrounds/game_background_2.png')
-GAME_BACKGROUNDS = [game_background, game_background, game_background]
+game_background2 = pygame.image.load('Hidden/Art/Backgrounds/game_background_3.png')
+game_background3 = pygame.image.load('Hidden/Art/Backgrounds/game_background_4.png')
+GAME_BACKGROUNDS = [game_background, game_background2, game_background3]
 
 # Menu and splash backgrounds.
 splash_background = pygame.image.load('Hidden/Art/Backgrounds/HuntTheHuman-GameMenuBackgroundv2.png')
-end_game_background = splash_background
+end_game_background = pygame.image.load('Hidden/Art/Backgrounds/HuntTheHuman-EndGameBackground.png')
 
 # UI tuning.
 BUTTON_WIDTH = 120
@@ -97,7 +101,7 @@ WALL_WIDTH = wall_image.get_width()
 WALL_HEIGHT = wall_image.get_height()
 
 _human_walk_frames_unscaled = [
-	pygame.image.load(f'Hidden/Art/Human/deserted_islander{index}.png')
+	pygame.image.load(f'Hidden/Art/Human/deserted_islander_running{index}.png')
 	for index in range(1, HUMAN_WALK_FRAME_COUNT + 1)
 ]
 human_walk_frames = [
@@ -109,8 +113,15 @@ human_walk_frames = [
 ]
 human_default_image = human_walk_frames[0]
 
-_fox_image= pygame.image.load('Hidden/Art/FoxOnHorse/Fox.png')
-fox_image = pygame.transform.scale(
-	_fox_image,
-	(_fox_image.get_width() * ART_SCALE, _fox_image.get_height() * ART_SCALE),
-)
+_fox_riding_frames_unscaled = [
+	pygame.image.load(f'Hidden/Art/FoxOnHorse/fox_riding{index}.png')
+	for index in range(1, FOX_RIDING_FRAME_COUNT + 1)
+]
+fox_riding_frames = [
+	pygame.transform.scale(
+		frame,
+		(frame.get_width() * ART_SCALE, frame.get_height() * ART_SCALE),
+	)
+	for frame in _fox_riding_frames_unscaled
+]
+fox_image = fox_riding_frames[0]

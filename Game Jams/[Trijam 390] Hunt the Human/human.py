@@ -163,10 +163,10 @@ class Human:
 
         if self._just_pressed(keys, "jump"):
             self.start_jump()
-        if self._just_pressed(keys, "hide"):
-            self.toggle_hole()
-        if self._just_pressed(keys, "climb"):
-            self.toggle_tree()
+        # if self._just_pressed(keys, "hide"):
+        #     self.toggle_hole()
+        # if self._just_pressed(keys, "climb"):
+        #     self.toggle_tree()
 
         self.apply_gravity()
         self.update_animation(dt_ms)

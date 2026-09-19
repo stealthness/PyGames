@@ -21,8 +21,8 @@ class BackgroundController:
         # Start with three tiles: left, center, right.
         self.active_tiles = [
             [self.backgrounds[0], -self.background_width],
-            [self.backgrounds[0], 0],
-            [self.backgrounds[0], self.background_width],
+            [self.backgrounds[1], 0],
+            [self.backgrounds[2], self.background_width]
         ]
         self.next_background_index = 1 % len(self.backgrounds)
 

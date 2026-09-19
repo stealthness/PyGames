@@ -11,7 +11,7 @@ from config import (
 )
 from fox import FoxGenerator
 from game_ui_manager import GameUIManager
-from hunan import Human
+from human import Human
 from wall import WallGenerator
 
 

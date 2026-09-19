@@ -5,6 +5,7 @@ from config import (
     FOX_HITBOX_INSET_X,
     FOX_HITBOX_INSET_Y,
     FOX_MAX_SPEED,
+    FOX_RIDING_FRAME_MS,
     FOX_SPEED,
     FOX_SPAWN_INTERVAL_DECREASE_MS,
     FOX_SPAWN_INTERVAL_MIN_MS,
@@ -13,6 +14,7 @@ from config import (
     FOX_START_X,
     SCREEN_HEIGHT,
     fox_image,
+    fox_riding_frames,
 )
 
 class Fox:
@@ -26,6 +28,9 @@ class Fox:
         self.rect = self.image.get_rect()
         self.rect.bottom = SCREEN_HEIGHT - FOX_BOTTOM_OFFSET
         self.rect.x = FOX_START_X
+        self.riding_frames = fox_riding_frames
+        self.riding_frame_index = 0
+        self.riding_frame_elapsed_ms = 0
 
         self.base_speed = FOX_SPEED
         self.max_speed = FOX_MAX_SPEED
@@ -42,6 +47,21 @@ class Fox:
 
     def _sync_hitbox(self):
         self.hitbox.midbottom = self.rect.midbottom
+
+    def _update_animation(self, dt_ms):
+        if not self.active:
+            return
+
+        self.riding_frame_elapsed_ms += dt_ms
+        while self.riding_frame_elapsed_ms >= FOX_RIDING_FRAME_MS:
+            self.riding_frame_elapsed_ms -= FOX_RIDING_FRAME_MS
+            self.riding_frame_index = (self.riding_frame_index + 1) % len(self.riding_frames)
+
+            anchor = self.rect.midbottom
+            self.image = self.riding_frames[self.riding_frame_index]
+            self.rect = self.image.get_rect()
+            self.rect.midbottom = anchor
+            self._sync_hitbox()
 
     def move(self):
         """Move fox in one direction and finish when off-screen."""
@@ -76,6 +96,7 @@ class Fox:
         
     def update(self, dt_ms=0):
         self.move()
+        self._update_animation(dt_ms)
     
 class FoxGenerator:
     """
