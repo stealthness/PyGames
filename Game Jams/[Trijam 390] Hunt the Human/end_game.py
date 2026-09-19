@@ -3,9 +3,9 @@ import asyncio
 import pygame
 from config import (
     BUTTON_HEIGHT,
-    BUTTON_OK_COLOR,
-    BUTTON_OK_HOVER_COLOR,
-    BUTTON_OK_TEXT_COLOR,
+    BUTTON_END_COLOR,
+    BUTTON_END_HOVER_COLOR,
+    BUTTON_END_TEXT_COLOR,
     BUTTON_WIDTH,
     FPS,
     SCREEN_HEIGHT,
@@ -24,7 +24,7 @@ class EndGame:
             BUTTON_HEIGHT,
             )
         self.button_font = pygame.font.Font(None, 36)
-        self.button_text = self.button_font.render("OK", True, BUTTON_OK_TEXT_COLOR)
+        self.button_text = self.button_font.render("Continue", True, BUTTON_END_TEXT_COLOR)
         self.button_text_rect = self.button_text.get_rect(center=self.button_rect.center)
 
     async def run(self, screen, clock):
@@ -41,11 +41,21 @@ class EndGame:
                     return False
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.handle_click():
-                        splash_running = False
+                        end_game_running = False
             self.draw(screen)
             clock.tick(FPS)
             await asyncio.sleep(0)
         return True
+
+    def handle_click(self):
+        """
+        Check if the OK button was clicked by the player. Returns True if clicked.
+        Call this after each pygame event loop.
+        """
+        mouse_pos = pygame.mouse.get_pos()
+        if self.button_rect.collidepoint(mouse_pos):
+            return True
+        return False
 
     def draw(self, screen):
         """Draw the end game with background and OK button."""
@@ -60,15 +70,5 @@ class EndGame:
         """Return the button color based on hover state."""
         mouse_pos = pygame.mouse.get_pos()
         if self.button_rect.collidepoint(mouse_pos):
-            return BUTTON_OK_HOVER_COLOR
-        return BUTTON_OK_COLOR
-
-    def handle_click(self):
-        """
-        Check if the OK button was clicked by the player. Returns True if clicked.
-        Call this after each pygame event loop.
-        """
-        mouse_pos = pygame.mouse.get_pos()
-        if self.button_rect.collidepoint(mouse_pos):
-            return True
-        return False
+            return BUTTON_END_HOVER_COLOR
+        return BUTTON_END_COLOR

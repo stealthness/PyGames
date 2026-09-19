@@ -51,7 +51,7 @@ async def main():
             end_game = EndGame()
             end_game_ok = await end_game.run(screen, clock)
             if end_game_ok:
-                game_status = GameStatus.Splash
+                game_status = GameStatus.Game
                 continue
             return
             

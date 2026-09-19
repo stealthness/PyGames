@@ -22,7 +22,7 @@ HUMAN_BOTTOM_OFFSET = 60
 HUMAN_GRAVITY = 0.2
 HUMAN_JUMP_VELOCITY = -10
 HUMAN_MAX_FALL_SPEED = 6
-HUMAN_START_LIVES = 3
+HUMAN_START_LIVES = 1
 HUMAN_INVULNERABILITY_MS = 2000
 HUMAN_HITBOX_INSET_X = 12
 HUMAN_HITBOX_INSET_Y = 8
@@ -54,15 +54,18 @@ game_background = pygame.image.load('Hidden/Art/Backgrounds/game_background_2.pn
 GAME_BACKGROUNDS = [game_background, game_background, game_background]
 
 # Menu and splash backgrounds.
-splash_background = pygame.image.load('Hidden/Art/Backgrounds/HuntTheHuman-GameMenuBackground.png')
+splash_background = pygame.image.load('Hidden/Art/Backgrounds/HuntTheHuman-GameMenuBackgroundv2.png')
 end_game_background = splash_background
 
 # UI tuning.
 BUTTON_WIDTH = 120
 BUTTON_HEIGHT = 50
-BUTTON_OK_COLOR = (100, 200, 100)
-BUTTON_OK_HOVER_COLOR = (150, 255, 150)
-BUTTON_OK_TEXT_COLOR = (0, 0, 0)
+BUTTON_PLAY_COLOR = (150, 0, 0)
+BUTTON_PLAY_HOVER_COLOR = (250, 0, 0)
+BUTTON_PLAY_TEXT_COLOR = (255,255,255)
+BUTTON_END_COLOR = (150, 0, 0)
+BUTTON_END_HOVER_COLOR = (250, 0, 0)
+BUTTON_END_TEXT_COLOR = (255,255,255)
 
 _ui_active_heart_base = pygame.image.load('Hidden/Art/Fluff/Heart1.png')
 _ui_inactive_heart_base = pygame.image.load('Hidden/Art/Fluff/Heart4.png')
