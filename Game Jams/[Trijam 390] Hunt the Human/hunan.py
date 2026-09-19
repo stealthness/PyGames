@@ -7,14 +7,16 @@ from config import (
     HUMAN_GRAVITY,
     HUMAN_HITBOX_INSET_X,
     HUMAN_HITBOX_INSET_Y,
-    HUMAN_INVULNERABILITY_FRAMES,
+    HUMAN_HITBOX_WIDTH_SCALE,
+    HUMAN_INVULNERABILITY_MS,
     HUMAN_JUMP_VELOCITY,
     HUMAN_KEYS_CLIMB,
     HUMAN_KEYS_HIDE,
     HUMAN_KEYS_JUMP,
     HUMAN_MAX_FALL_SPEED,
+    HUMAN_PLATFORM_LAND_TOLERANCE,
     HUMAN_START_LIVES,
-    HUMAN_WALK_FRAME_TICKS,
+    HUMAN_WALK_FRAME_MS,
     human_default_image,
     human_walk_frames,
 )
@@ -36,7 +38,8 @@ class Human:
         self.rect.midbottom = (SCREEN_WIDTH // 2, SCREEN_HEIGHT - HUMAN_BOTTOM_OFFSET)
         self.walk_frames = human_walk_frames
         self.walk_frame_index = 0
-        self.walk_frame_tick = 0
+        self.walk_frame_elapsed_ms = 0
+        self.platform_land_tolerance = HUMAN_PLATFORM_LAND_TOLERANCE
 
         # Core movement tuning values.
         self.gravity = HUMAN_GRAVITY
@@ -45,12 +48,18 @@ class Human:
 
         self.velocity_y = 0.0
         self.ground_y = self.rect.y
+        self.previous_rect = self.rect.copy()
+        self.hitbox = self.rect.inflate(-HUMAN_HITBOX_INSET_X, -HUMAN_HITBOX_INSET_Y)
+        self.hitbox.width = max(1, int(self.hitbox.width * HUMAN_HITBOX_WIDTH_SCALE))
+        self.hitbox.midbottom = self.rect.midbottom
+        self.previous_hitbox = self.hitbox.copy()
+        self.ground_hitbox_bottom = self.hitbox.bottom
 
         self.lives = HUMAN_START_LIVES
         self.in_hole = False
         self.on_tree = False
         self.on_ground = True
-        self.invulnerability_frames = 0
+        self.invulnerability_ms_remaining = 0
 
         # Track prior action state so toggles happen once per key press.
         self._action_key_map = {
@@ -69,6 +78,14 @@ class Human:
         was_pressed = self._previous_actions[action]
         self._previous_actions[action] = pressed_now
         return pressed_now and not was_pressed
+
+    def _sync_hitbox_to_rect(self):
+        """Keep collision hitbox aligned to the visual sprite position."""
+        self.hitbox.midbottom = self.rect.midbottom
+
+    def _sync_rect_to_hitbox(self):
+        """Keep visual sprite aligned to the collision hitbox position."""
+        self.rect.midbottom = self.hitbox.midbottom
 
     def start_jump(self):
         if self.on_ground and not self.in_hole and not self.on_tree:
@@ -90,39 +107,48 @@ class Human:
             return
 
         self.velocity_y = min(self.velocity_y + self.gravity, self.max_fall_speed)
-        self.rect.y += int(self.velocity_y)
+        self.hitbox.y += int(self.velocity_y)
+        self._sync_rect_to_hitbox()
 
-        if self.rect.y >= self.ground_y:
-            self.rect.y = self.ground_y
+        if self.hitbox.bottom >= self.ground_hitbox_bottom:
+            self.hitbox.bottom = self.ground_hitbox_bottom
+            self._sync_rect_to_hitbox()
             self.velocity_y = 0
             self.on_ground = True
 
-    def update_animation(self):
+    def update_animation(self, dt_ms):
         if self.in_hole or self.on_tree:
             self.walk_frame_index = 0
             self.image = self.walk_frames[self.walk_frame_index]
+            self.walk_frame_elapsed_ms = 0
             return
 
-        self.walk_frame_tick += 1
-        if self.walk_frame_tick < HUMAN_WALK_FRAME_TICKS:
-            return
+        self.walk_frame_elapsed_ms += dt_ms
+        while self.walk_frame_elapsed_ms >= HUMAN_WALK_FRAME_MS:
+            self.walk_frame_elapsed_ms -= HUMAN_WALK_FRAME_MS
+            self.walk_frame_index = (self.walk_frame_index + 1) % len(self.walk_frames)
 
-        self.walk_frame_tick = 0
-        self.walk_frame_index = (self.walk_frame_index + 1) % len(self.walk_frames)
-
-        anchor = self.rect.midbottom
-        self.image = self.walk_frames[self.walk_frame_index]
-        self.rect = self.image.get_rect()
-        self.rect.midbottom = anchor
+            anchor = self.rect.midbottom
+            self.image = self.walk_frames[self.walk_frame_index]
+            self.rect = self.image.get_rect()
+            self.rect.midbottom = anchor
+            self._sync_hitbox_to_rect()
 
     def get_collision_rect(self):
-        return self.rect.inflate(-HUMAN_HITBOX_INSET_X, -HUMAN_HITBOX_INSET_Y)
+        return self.hitbox.copy()
+
+    def land_on_surface(self, surface_top_y):
+        """Snap the player to the top of a platform while descending."""
+        self.hitbox.bottom = surface_top_y
+        self._sync_rect_to_hitbox()
+        self.velocity_y = 0
+        self.on_ground = True
 
     def take_damage(self, amount=1):
-        if self.invulnerability_frames > 0:
+        if self.invulnerability_ms_remaining > 0:
             return
         self.lives = max(0, self.lives - amount)
-        self.invulnerability_frames = HUMAN_INVULNERABILITY_FRAMES
+        self.invulnerability_ms_remaining = HUMAN_INVULNERABILITY_MS
 
     def is_alive(self):
         return self.lives > 0
@@ -130,7 +156,9 @@ class Human:
     def draw(self, screen):
         screen.blit(self.image, self.rect)
         
-    def update(self):
+    def update(self, dt_ms=0):
+        self.previous_rect = self.rect.copy()
+        self.previous_hitbox = self.hitbox.copy()
         keys = pygame.key.get_pressed()
 
         if self._just_pressed(keys, "jump"):
@@ -141,7 +169,7 @@ class Human:
             self.toggle_tree()
 
         self.apply_gravity()
-        self.update_animation()
+        self.update_animation(dt_ms)
 
-        if self.invulnerability_frames > 0:
-            self.invulnerability_frames -= 1
+        if self.invulnerability_ms_remaining > 0:
+            self.invulnerability_ms_remaining = max(0, self.invulnerability_ms_remaining - dt_ms)
