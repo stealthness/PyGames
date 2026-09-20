@@ -30,7 +30,7 @@ class Fox:
         self.rect.bottom = SCREEN_HEIGHT - FOX_BOTTOM_OFFSET
         self.rect.x = FOX_START_X
         # Animation
-        #self.riding_frames = fox_riding_frames
+        self.riding_frames = fox_riding_frames
         self.riding_frame_index = 0
         self.riding_frame_elapsed_ms = 0
         # Movement
@@ -76,13 +76,14 @@ class Fox:
             return
 
         self.riding_frame_elapsed_ms += dt_ms
-        # while self.riding_frame_elapsed_ms >= FOX_RIDING_FRAME_MS:
-        #     self.riding_frame_elapsed_ms -= FOX_RIDING_FRAME_MS
-        #     self.riding_frame_index = (self.riding_frame_index + 1) % len(self.riding_frames)
-        # 
-        #     anchor = self.rect.mid_bottom
-        #     self.image = self.riding_frames[self.riding_frame_index]
-        #     self.rect = self.image.get_rect()
+        while self.riding_frame_elapsed_ms >= FOX_RIDING_FRAME_MS:
+            self.riding_frame_elapsed_ms -= FOX_RIDING_FRAME_MS
+            self.riding_frame_index = (self.riding_frame_index + 1) % len(self.riding_frames)
+            
+            anchor = self.rect.midbottom
+            self.image = self.riding_frames[self.riding_frame_index]
+            self.rect = self.image.get_rect()
+            self.rect.midbottom = anchor
  
 
 

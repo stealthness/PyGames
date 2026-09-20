@@ -6,12 +6,15 @@ SCREEN_HEIGHT = 600
 ART_SCALE = 4
 
 FPS = 60
-
 # Debug and test mode settings.
-TEST_MODE_DEFAULT = True
+TEST_MODE_DEFAULT = False
 TEST_MODE_TOGGLE_KEY = pygame.K_F1
 TEST_MODE_HITBOX_COLOR = (255, 0, 0)
 TEST_MODE_HITBOX_WIDTH = 2
+
+MUSIC_VOLUME = 0.5
+MUSIC_TOGGLE_KEY = pygame.K_m
+MUSIC_PATH = "Hidden/Sound/331music-comedy-cinematic-cartoon-603031.ogg"
 
 # Background movement tuning.
 BACKGROUND_SCROLL_SPEED = 1
@@ -113,22 +116,23 @@ human_walk_frames = [
 ]
 human_default_image = human_walk_frames[0]
 
-# _fox_riding_frames_unscaled = [
-# 	pygame.image.load(f'Hidden/Art/FoxOnHorse/fox_riding{index}.png')
-# 	for index in range(1, FOX_RIDING_FRAME_COUNT + 1)
-# ]
-fox_riding_frames = []
-# fox_riding_frames = [
-# 	pygame.transform.scale(
-# 		frame,
-# 		(frame.get_width() * ART_SCALE, frame.get_height() * ART_SCALE),
-# 	)
-# 	for frame in _fox_riding_frames_unscaled
-# ]
-# fox_image = fox_riding_frames[0]
+_fox_riding_frames_unscaled = [
+	pygame.image.load(f'Hidden/Art/FoxOnHorse/fox_riding{index}.png')
+	for index in range(1, FOX_RIDING_FRAME_COUNT + 1)
+]
+
 
 _fox_image= pygame.image.load('Hidden/Art/FoxOnHorse/Fox.png')
 fox_image = pygame.transform.scale(
 	_fox_image,
 	(_fox_image.get_width() * ART_SCALE, _fox_image.get_height() * ART_SCALE),
 )
+
+# fox_riding_frames = [fox_image, fox_image, fox_image, fox_image]
+fox_riding_frames = [
+	pygame.transform.scale(
+		frame,
+		(frame.get_width() * ART_SCALE, frame.get_height() * ART_SCALE),
+	)
+	for frame in _fox_riding_frames_unscaled
+]
