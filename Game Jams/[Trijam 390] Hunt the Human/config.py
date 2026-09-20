@@ -8,7 +8,7 @@ ART_SCALE = 4
 FPS = 60
 
 # Debug and test mode settings.
-TEST_MODE_DEFAULT = False
+TEST_MODE_DEFAULT = True
 TEST_MODE_TOGGLE_KEY = pygame.K_F1
 TEST_MODE_HITBOX_COLOR = (255, 0, 0)
 TEST_MODE_HITBOX_WIDTH = 2

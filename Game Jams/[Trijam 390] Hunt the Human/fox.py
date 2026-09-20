@@ -44,7 +44,7 @@ class Fox:
 
     def update(self, dt_ms=0):
         self.move()
-        #self._update_animation(dt_ms)
+        self._update_animation(dt_ms)
 
     def move(self):
         """Move fox in one direction and finish when off-screen."""
@@ -52,6 +52,7 @@ class Fox:
             return
 
         self.rect.x += self.speed_x
+        self._sync_hitbox()
 
         if self.rect.right < 0:
             self.active = False
@@ -73,18 +74,17 @@ class Fox:
             return
 
         self.riding_frame_elapsed_ms += dt_ms
-        while self.riding_frame_elapsed_ms >= FOX_RIDING_FRAME_MS:
-            self.riding_frame_elapsed_ms -= FOX_RIDING_FRAME_MS
-            self.riding_frame_index = (self.riding_frame_index + 1) % len(self.riding_frames)
+        # while self.riding_frame_elapsed_ms >= FOX_RIDING_FRAME_MS:
+        #     self.riding_frame_elapsed_ms -= FOX_RIDING_FRAME_MS
+        #     self.riding_frame_index = (self.riding_frame_index + 1) % len(self.riding_frames)
+        # 
+        #     anchor = self.rect.mid_bottom
+        #     self.image = self.riding_frames[self.riding_frame_index]
+        #     self.rect = self.image.get_rect()
+ 
 
-            anchor = self.rect.midbottom
-            self.image = self.riding_frames[self.riding_frame_index]
-            self.rect = self.image.get_rect()
-            self.rect.midbottom = anchor
-            self._sync_hitbox()
 
 
-        self._sync_hitbox()
 
     def on_player_collision(self):
         """Increase fox speed after hitting the player."""
