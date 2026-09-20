@@ -7,10 +7,11 @@ from config import (
     TEST_MODE_DEFAULT,
     TEST_MODE_HITBOX_COLOR,
     TEST_MODE_HITBOX_WIDTH,
-    TEST_MODE_TOGGLE_KEY,
+    TEST_MODE_TOGGLE_KEY
 )
 from fox import FoxGenerator
 from game_ui_manager import GameUIManager
+from musicManager import MusicManager
 from human import Human
 from wall import WallGenerator
 
@@ -32,6 +33,9 @@ class Game:
         self.game_objects = [self.human]
         self.test_mode = TEST_MODE_DEFAULT
         self.quit_requested = False
+        self.music_manager = MusicManager("Hidden/Sound/331music-comedy-cinematic-cartoon-603031.ogg")
+        self.music_manager.load_music()
+        self.music_manager.play_music()
         
         
     def run(self, dt_ms=0):
@@ -40,8 +44,11 @@ class Game:
             if event.type == pygame.QUIT:
                 self.quit_requested = True
                 return False
-            if event.type == pygame.KEYDOWN and event.key == TEST_MODE_TOGGLE_KEY:
-                self.test_mode = not self.test_mode
+            if event.type == pygame.KEYDOWN:
+                if event.key == TEST_MODE_TOGGLE_KEY:
+                    self.test_mode = not self.test_mode
+                if event.key == pygame.K_m:
+                    self.music_manager.toggle_music()
 
         self.update(dt_ms)
         if not self.human.is_alive:

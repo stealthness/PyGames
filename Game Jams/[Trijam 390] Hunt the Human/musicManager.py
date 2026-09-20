@@ -6,18 +6,16 @@ class MusicManager:
     The purpose of  this class is to manage the music
     """
     
-    def __init__(self, music_path, music_volume=0.5):
+    def __init__(self, music_path):
         self.music = music_path
         self.load_music()
         self.is_toggled_on = True
-        self.music_volume = music_volume
         
         
         
     def load_music(self):
         pygame.mixer.music.load(self.music)
         pygame.mixer.init(44100, -16, 2, 2048)
-        pygame.mixer.music.set_volume(self.music_volume)
         
         
     def play_music(self):
