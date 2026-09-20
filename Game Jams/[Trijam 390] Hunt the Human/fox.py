@@ -14,7 +14,7 @@ from config import (
     FOX_START_X,
     SCREEN_HEIGHT,
     fox_image,
-    fox_riding_frames,
+    #fox_riding_frames,
 )
 
 class Fox:
@@ -28,7 +28,7 @@ class Fox:
         self.rect = self.image.get_rect()
         self.rect.bottom = SCREEN_HEIGHT - FOX_BOTTOM_OFFSET
         self.rect.x = FOX_START_X
-        self.riding_frames = fox_riding_frames
+        #self.riding_frames = fox_riding_frames
         self.riding_frame_index = 0
         self.riding_frame_elapsed_ms = 0
 
@@ -96,7 +96,7 @@ class Fox:
         
     def update(self, dt_ms=0):
         self.move()
-        self._update_animation(dt_ms)
+        #self._update_animation(dt_ms)
     
 class FoxGenerator:
     """

@@ -113,15 +113,21 @@ human_walk_frames = [
 ]
 human_default_image = human_walk_frames[0]
 
-_fox_riding_frames_unscaled = [
-	pygame.image.load(f'Hidden/Art/FoxOnHorse/fox_riding{index}.png')
-	for index in range(1, FOX_RIDING_FRAME_COUNT + 1)
-]
-fox_riding_frames = [
-	pygame.transform.scale(
-		frame,
-		(frame.get_width() * ART_SCALE, frame.get_height() * ART_SCALE),
-	)
-	for frame in _fox_riding_frames_unscaled
-]
-fox_image = fox_riding_frames[0]
+# _fox_riding_frames_unscaled = [
+# 	pygame.image.load(f'Hidden/Art/FoxOnHorse/fox_riding{index}.png')
+# 	for index in range(1, FOX_RIDING_FRAME_COUNT + 1)
+# ]
+# fox_riding_frames = [
+# 	pygame.transform.scale(
+# 		frame,
+# 		(frame.get_width() * ART_SCALE, frame.get_height() * ART_SCALE),
+# 	)
+# 	for frame in _fox_riding_frames_unscaled
+# ]
+# fox_image = fox_riding_frames[0]
+
+_fox_image= pygame.image.load('Hidden/Art/FoxOnHorse/Fox.png')
+fox_image = pygame.transform.scale(
+	_fox_image,
+	(_fox_image.get_width() * ART_SCALE, _fox_image.get_height() * ART_SCALE),
+)
