@@ -117,6 +117,7 @@ human_default_image = human_walk_frames[0]
 # 	pygame.image.load(f'Hidden/Art/FoxOnHorse/fox_riding{index}.png')
 # 	for index in range(1, FOX_RIDING_FRAME_COUNT + 1)
 # ]
+fox_riding_frames = []
 # fox_riding_frames = [
 # 	pygame.transform.scale(
 # 		frame,

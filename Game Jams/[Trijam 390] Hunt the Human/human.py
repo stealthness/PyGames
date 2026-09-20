@@ -60,7 +60,7 @@ class Human:
         self.on_tree = False
         self.on_ground = True
         self.invulnerability_ms_remaining = 0
-
+         
         # Track prior action state so toggles happen once per key press.
         self._action_key_map = {
             "jump": HUMAN_KEYS_JUMP,
@@ -72,6 +72,30 @@ class Human:
             "hide": False,
             "climb": False,
         }
+    @property    
+    def is_alive(self):
+        return self.lives > 0
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+    def update(self, dt_ms=0):
+        self.previous_rect = self.rect.copy()
+        self.previous_hitbox = self.hitbox.copy()
+        keys = pygame.key.get_pressed()
+
+        if self._just_pressed(keys, "jump"):
+            self.start_jump()
+        # if self._just_pressed(keys, "hide"):
+        #     self.toggle_hole()
+        # if self._just_pressed(keys, "climb"):
+        #     self.toggle_tree()
+
+        self.apply_gravity()
+        self.update_animation(dt_ms)
+
+
+
 
     def _just_pressed(self, keys, action):
         pressed_now = any(keys[key_code] for key_code in self._action_key_map[action])
@@ -116,6 +140,8 @@ class Human:
             self.velocity_y = 0
             self.on_ground = True
 
+
+
     def update_animation(self, dt_ms):
         if self.in_hole or self.on_tree:
             self.walk_frame_index = 0
@@ -133,7 +159,10 @@ class Human:
             self.rect = self.image.get_rect()
             self.rect.midbottom = anchor
             self._sync_hitbox_to_rect()
-
+            
+        if self.invulnerability_ms_remaining > 0:
+            self.invulnerability_ms_remaining = max(0, self.invulnerability_ms_remaining - dt_ms)
+            
     def get_collision_rect(self):
         return self.hitbox.copy()
 
@@ -149,27 +178,3 @@ class Human:
             return
         self.lives = max(0, self.lives - amount)
         self.invulnerability_ms_remaining = HUMAN_INVULNERABILITY_MS
-
-    def is_alive(self):
-        return self.lives > 0
-        
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
-        
-    def update(self, dt_ms=0):
-        self.previous_rect = self.rect.copy()
-        self.previous_hitbox = self.hitbox.copy()
-        keys = pygame.key.get_pressed()
-
-        if self._just_pressed(keys, "jump"):
-            self.start_jump()
-        # if self._just_pressed(keys, "hide"):
-        #     self.toggle_hole()
-        # if self._just_pressed(keys, "climb"):
-        #     self.toggle_tree()
-
-        self.apply_gravity()
-        self.update_animation(dt_ms)
-
-        if self.invulnerability_ms_remaining > 0:
-            self.invulnerability_ms_remaining = max(0, self.invulnerability_ms_remaining - dt_ms)

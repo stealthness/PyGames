@@ -44,7 +44,7 @@ class Game:
                 self.test_mode = not self.test_mode
 
         self.update(dt_ms)
-        if not self.human.is_alive():
+        if not self.human.is_alive:
             return False
         self.draw()
         return True

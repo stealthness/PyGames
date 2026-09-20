@@ -14,7 +14,7 @@ from config import (
     FOX_START_X,
     SCREEN_HEIGHT,
     fox_image,
-    #fox_riding_frames,
+    fox_riding_frames,
 )
 
 class Fox:
@@ -63,8 +63,10 @@ class Fox:
             return
         screen.blit(self.image, self.rect)
 
-    def is_finished(self):
-        return not self.active
+
+    @property
+    def is_active(self):
+        return self.active
 
     def _sync_hitbox(self):
         self.hitbox.midbottom = self.rect.midbottom
@@ -145,7 +147,7 @@ class FoxGenerator:
         for fox in self.foxes:
             fox.update(dt_ms)
 
-        self.foxes = [fox for fox in self.foxes if not fox.is_finished()]
+        self.foxes = [fox for fox in self.foxes if fox.is_active]
 
     def get_all_foxes(self):
         return self.foxes
