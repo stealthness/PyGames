@@ -18,32 +18,52 @@ from config import (
 )
 
 class Fox:
+
     """
     fox is an enemy that will move from the right or left across the screen
     if fox touches a person it will double in speed and player life is taken off
     """
-    
     def __init__(self):
+        # Image
         self.image = fox_image
         self.rect = self.image.get_rect()
         self.rect.bottom = SCREEN_HEIGHT - FOX_BOTTOM_OFFSET
         self.rect.x = FOX_START_X
+        # Animation
         #self.riding_frames = fox_riding_frames
         self.riding_frame_index = 0
         self.riding_frame_elapsed_ms = 0
-
+        # Movement
         self.base_speed = FOX_SPEED
         self.max_speed = FOX_MAX_SPEED
         self.speed_x = -self.base_speed
         self.active = True
-
+        # Hit Box
         self.hitbox = self.rect.inflate(-FOX_HITBOX_INSET_X, -FOX_HITBOX_INSET_Y)
         self.hitbox.midbottom = self.rect.midbottom
+
+    def update(self, dt_ms=0):
+        self.move()
+        #self._update_animation(dt_ms)
+
+    def move(self):
+        """Move fox in one direction and finish when off-screen."""
+        if not self.active:
+            return
+
+        self.rect.x += self.speed_x
+
+        if self.rect.right < 0:
+            self.active = False
+
 
     def draw(self, screen):
         if not self.active:
             return
         screen.blit(self.image, self.rect)
+
+    def is_finished(self):
+        return not self.active
 
     def _sync_hitbox(self):
         self.hitbox.midbottom = self.rect.midbottom
@@ -63,15 +83,6 @@ class Fox:
             self.rect.midbottom = anchor
             self._sync_hitbox()
 
-    def move(self):
-        """Move fox in one direction and finish when off-screen."""
-        if not self.active:
-            return
-
-        self.rect.x += self.speed_x
-
-        if self.rect.right < 0:
-            self.active = False
 
         self._sync_hitbox()
 
@@ -90,13 +101,6 @@ class Fox:
         if not self.active:
             return None
         return self.hitbox.copy()
-
-    def is_finished(self):
-        return not self.active
-        
-    def update(self, dt_ms=0):
-        self.move()
-        #self._update_animation(dt_ms)
     
 class FoxGenerator:
     """
