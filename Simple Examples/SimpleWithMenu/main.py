@@ -7,7 +7,7 @@ from endgame import EndGame
 from splash import Splash
 from menu import Menu
 from game import Game
-from config import WIDTH, HEIGHT, FPS, TITLE, DEBUG_MODE
+from config import WIDTH, HEIGHT, TITLE
 
 
 # --------------------------------------------------
@@ -18,10 +18,10 @@ class GameStatus(Enum):
     """
     Represents the different states of the game.
     """
-    Splash = 0,
-    Menu = 1,
-    Running = 2,
-    Finished = 3,
+    Splash = 0
+    Menu = 1
+    Running = 2
+    Finished = 3
     
 # --------------------------------------------------
 # Initialization

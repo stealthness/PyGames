@@ -6,10 +6,9 @@ DEBUG_MODE = True
 
 WIDTH = 960
 HEIGHT = 540
-FPS = 60
-
 TITLE = "A Simple Pygame outline"
 
+# cwd will be at SimpleWithMenu, this is how pygbag will compile code from.
 
 # Menu and splash backgrounds.
 splash_background = pygame.image.load('Hidden/Backgrounds/splash_background.png')

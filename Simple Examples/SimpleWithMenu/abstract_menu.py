@@ -1,7 +1,6 @@
 import asyncio
 from abc import abstractmethod, ABC
 import pygame
-from config import DEBUG_MODE
 
 class AbstractMenu(ABC):
     """

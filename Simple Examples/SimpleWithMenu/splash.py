@@ -1,6 +1,4 @@
-import asyncio
 import pygame
-from _testcapi import awaitType
 
 from abstract_menu import AbstractMenu
 from config import DEBUG_MODE, splash_background

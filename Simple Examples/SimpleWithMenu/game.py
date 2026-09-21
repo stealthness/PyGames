@@ -25,9 +25,9 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return False
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.handle_click():
-                        game_running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return True
             self.update()
             self.draw()
             #clock.tick(FPS)
@@ -38,7 +38,7 @@ class Game:
         self.frame_tick += 1
 
     def draw(self):
-        variation =50 * math.sin(self.frame_tick/1000)
+        variation =  int(50 * math.sin(self.frame_tick/1000))
         self.screen.fill((50 + variation, 20, 30))
         pygame.display.flip()
 
