@@ -5,6 +5,7 @@ import pygame
 
 from splash import Splash
 from menu import Menu
+from game import Game
 from config import WIDTH, HEIGHT, FPS, TITLE
 
 
@@ -66,8 +67,12 @@ async def main():
             return
 
         if game_status == GameStatus.Running:
-            # Handle game logic
-            pass
+            game = Game(screen)
+            game_ok = await game.run()
+            if game_ok:
+                game_status = GameStatus.Finished
+                continue
+            return
 
         # Draw the background
         screen.fill((20, 20, 30))
