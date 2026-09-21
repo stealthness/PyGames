@@ -3,6 +3,7 @@ from enum import Enum
 
 import pygame
 
+from splash import Splash
 
 # --------------------------------------------------
 # Configuration
@@ -14,7 +15,19 @@ FPS = 60
 
 TITLE = "A Simple Pygame outline"
 
+# --------------------------------------------------
+# GameStatus
+# --------------------------------------------------
 
+class GameStatus(Enum):
+    """
+    Represents the different states of the game.
+    """
+    Splash = 0,
+    Menu = 1,
+    Running = 2,
+    Finished = 3,
+    
 # --------------------------------------------------
 # Initialization
 # --------------------------------------------------
@@ -32,30 +45,36 @@ clock = pygame.time.Clock()
 # --------------------------------------------------
 
 running = True
-
+game_status = GameStatus.Splash
 # --------------------------------------------------
 # Async Game Loop
 # --------------------------------------------------
 
 async def main():
     global running
-
+    global game_status
+    
     while running:
+        # Start with Splash
+        if game_status == GameStatus.Splash:
+            splash = Splash(screen)
+            splash_ok = await splash.run()
+            if splash_ok:
+                game_status = GameStatus.Menu
+                continue
+            return   
         
-        for event in pygame.event.get():
+        if game_status == GameStatus.Menu:
+            # Handle menu logic
+            pass
+        
+        if game_status == GameStatus.Running:
+            # Handle game logic
+            pass
 
-            if event.type == pygame.QUIT:
-                running = False
-
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False        
-        
-        
         # Draw the background
         screen.fill((20, 20, 30))
 
-        
         # Display the new screen
         pygame.display.flip()
         
@@ -63,12 +82,6 @@ async def main():
 
     pygame.quit()
 
-class GameStatus(Enum):
-    
-    Splash = 0,
-    Menu = 1,
-    Running = 2,
-    Finished = 3,
 
 
 
