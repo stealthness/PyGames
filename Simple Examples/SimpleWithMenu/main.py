@@ -1,20 +1,12 @@
 import asyncio
 from enum import Enum
-from tkinter import Menu
 
 import pygame
 
 from splash import Splash
+from menu import Menu
+from config import WIDTH, HEIGHT, FPS, TITLE
 
-# --------------------------------------------------
-# Configuration
-# --------------------------------------------------
-
-WIDTH = 960
-HEIGHT = 540
-FPS = 60
-
-TITLE = "A Simple Pygame outline"
 
 # --------------------------------------------------
 # GameStatus
