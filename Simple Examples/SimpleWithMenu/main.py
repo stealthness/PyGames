@@ -3,10 +3,11 @@ from enum import Enum
 
 import pygame
 
+from endgame import EndGame
 from splash import Splash
 from menu import Menu
 from game import Game
-from config import WIDTH, HEIGHT, FPS, TITLE
+from config import WIDTH, HEIGHT, FPS, TITLE, DEBUG_MODE
 
 
 # --------------------------------------------------
@@ -73,6 +74,22 @@ async def main():
                 game_status = GameStatus.Finished
                 continue
             return
+
+
+        if DEBUG_MODE:
+            print("(3) game_status:", game_status)
+            
+        if game_status == GameStatus.Finished:
+            end_game = EndGame(screen)
+            end_game_ok = await end_game.run()
+            if end_game_ok:
+                game_status = GameStatus.Menu
+                continue
+            return
+
+
+        if DEBUG_MODE:
+            print("(4) game_status:", game_status)
 
         # Draw the background
         screen.fill((20, 20, 30))
