@@ -16,7 +16,8 @@ class Game:
     async def run(self):
         """
         Run the game loop. Handles events, updates, and drawing.
-        Returns False if the user quits, True if the game is completed.
+        Returns False if the user quits, True if the game is completed or
+        player chooses to exit via escape keys.
         """
         if DEBUG_MODE:
             print("running Game")
@@ -30,7 +31,6 @@ class Game:
                         return True
             self.update()
             self.draw()
-            #clock.tick(FPS)
             await asyncio.sleep(0)
         return True
 
@@ -41,6 +41,3 @@ class Game:
         variation =  int(50 * math.sin(self.frame_tick/1000))
         self.screen.fill((50 + variation, 20, 30))
         pygame.display.flip()
-
-    def handle_click(self):
-        return True
