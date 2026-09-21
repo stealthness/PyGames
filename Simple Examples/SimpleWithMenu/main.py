@@ -75,9 +75,6 @@ async def main():
                 continue
             return
 
-
-        if DEBUG_MODE:
-            print("(3) game_status:", game_status)
             
         if game_status == GameStatus.Finished:
             end_game = EndGame(screen)
@@ -86,16 +83,6 @@ async def main():
                 game_status = GameStatus.Menu
                 continue
             return
-
-
-        if DEBUG_MODE:
-            print("(4) game_status:", game_status)
-
-        # Draw the background
-        screen.fill((20, 20, 30))
-
-        # Display the new screen
-        pygame.display.flip()
         
         await asyncio.sleep(0)
 

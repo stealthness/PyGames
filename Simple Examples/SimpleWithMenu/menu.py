@@ -1,37 +1,23 @@
-import asyncio
-
 import pygame
 
+from abstract_menu import AbstractMenu
 from config import DEBUG_MODE, menu_background
 
-class Menu:
+class Menu (AbstractMenu):
     """
-    Handle the Splash screen at the beginning of the game
+    Handle the Menu Screen
     """
     def __init__(self, screen):
-        self.screen = screen
-
+        super().__init__(screen)
 
     async def run(self):
         """
-        Run the splash screen loop. Handles events, updates, and drawing.
+        Run the menu screen loop. Handles events, updates, and drawing.
         Returns False if the user quits, True if OK button is clicked.
         """
         if DEBUG_MODE:
-            print("running Splash")
-        menu_running = True
-        while menu_running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    return False
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.handle_click():
-                        menu_running = False
-            self.update()
-            self.draw()
-            #clock.tick(FPS)
-            await asyncio.sleep(0)
-        return True
+            print("running menu")
+        return await super().run()
 
     def update(self):
         pass
@@ -39,6 +25,3 @@ class Menu:
     def draw(self):
         self.screen.blit(menu_background, (0, 0))
         pygame.display.flip()
-
-    def handle_click(self):
-        return True
