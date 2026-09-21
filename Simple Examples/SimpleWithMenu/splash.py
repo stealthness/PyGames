@@ -1,6 +1,6 @@
 import asyncio
 import pygame
-from config import DEBUG_MODE
+from config import DEBUG_MODE, splash_background
 
 
 
@@ -37,7 +37,7 @@ class Splash:
         pass
     
     def draw(self):
-        self.screen.fill((20, 20, 30))
+        self.screen.blit(splash_background, (0, 0))
         pygame.display.flip()
     
     def handle_click(self):

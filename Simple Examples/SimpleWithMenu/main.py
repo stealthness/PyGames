@@ -1,5 +1,6 @@
 import asyncio
 from enum import Enum
+from tkinter import Menu
 
 import pygame
 
@@ -65,9 +66,13 @@ async def main():
             return   
         
         if game_status == GameStatus.Menu:
-            # Handle menu logic
-            pass
-        
+            menu = Menu(screen)
+            menu_ok = await menu.run()
+            if menu_ok:
+                game_status = GameStatus.Running
+                continue
+            return
+
         if game_status == GameStatus.Running:
             # Handle game logic
             pass
