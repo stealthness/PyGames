@@ -1,6 +1,8 @@
 import asyncio
 
 import pygame
+from animator import Animator
+
 from config import (
     BUTTON_HEIGHT,
     BUTTON_END_COLOR,
@@ -11,6 +13,7 @@ from config import (
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
     end_game_background,
+    end_game_backgrounds
 )
 
 class EndGame:
@@ -26,6 +29,7 @@ class EndGame:
         self.button_font = pygame.font.Font(None, 36)
         self.button_text = self.button_font.render("Continue", True, BUTTON_END_TEXT_COLOR)
         self.button_text_rect = self.button_text.get_rect(center=self.button_rect.center)
+        self.animator = Animator(end_game_backgrounds)
 
     async def run(self, screen, clock):
         """
@@ -42,7 +46,10 @@ class EndGame:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.handle_click():
                         end_game_running = False
+            self.animator.update()
+            self.animator.draw(screen)
             self.draw(screen)
+            pygame.display.flip()
             clock.tick(FPS)
             await asyncio.sleep(0)
         return True
@@ -59,7 +66,6 @@ class EndGame:
 
     def draw(self, screen):
         """Draw the end game with background and OK button."""
-        screen.blit(self.end_game_background, (0, 0))
         pygame.draw.rect(screen, self.get_button_color(), self.button_rect)
         pygame.draw.rect(screen, (0, 0, 0), self.button_rect, 2)
         self.button_text_rect.center = self.button_rect.center

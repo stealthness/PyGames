@@ -1,14 +1,14 @@
 from enum import Enum
-
 import pygame
 
-from background_controller import BackgroundController
 from config import (
     TEST_MODE_DEFAULT,
     TEST_MODE_HITBOX_COLOR,
     TEST_MODE_HITBOX_WIDTH,
     TEST_MODE_TOGGLE_KEY
 )
+
+from background_controller import BackgroundController
 from fox import FoxGenerator
 from game_ui_manager import GameUIManager
 from musicManager import MusicManager
@@ -34,6 +34,7 @@ class Game:
         self.test_mode = TEST_MODE_DEFAULT
         self.quit_requested = False
         self.music_manager = MusicManager("Hidden/Sound/331music-comedy-cinematic-cartoon-603031.ogg")
+        pygame.mixer.pre_init(44100, -16, 2, 2048)
         self.music_manager.load_music()
         self.music_manager.play_music()
         

@@ -86,9 +86,6 @@ class Fox:
             self.rect.midbottom = anchor
  
 
-
-
-
     def on_player_collision(self):
         """Increase fox speed after hitting the player."""
         if not self.active:

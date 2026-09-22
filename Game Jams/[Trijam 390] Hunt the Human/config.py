@@ -17,7 +17,7 @@ MUSIC_TOGGLE_KEY = pygame.K_m
 MUSIC_PATH = "Hidden/Sound/331music-comedy-cinematic-cartoon-603031.ogg"
 
 # Background movement tuning.
-BACKGROUND_SCROLL_SPEED = 1
+BACKGROUND_SCROLL_SPEED = 2
 BACKGROUND_RECYCLE_THRESHOLD = 100
 
 # Human tuning values.
@@ -25,13 +25,13 @@ HUMAN_BOTTOM_OFFSET = 60
 HUMAN_GRAVITY = 0.2
 HUMAN_JUMP_VELOCITY = -10
 HUMAN_MAX_FALL_SPEED = 6
-HUMAN_START_LIVES = 3
+HUMAN_START_LIVES = 1
 HUMAN_INVULNERABILITY_MS = 2000
 HUMAN_HITBOX_INSET_X = 12
 HUMAN_HITBOX_INSET_Y = 8
 HUMAN_HITBOX_WIDTH_SCALE = 0.5
 HUMAN_WALK_FRAME_COUNT = 11
-HUMAN_WALK_FRAME_MS = 100
+HUMAN_WALK_FRAME_MS = 50
 HUMAN_PLATFORM_LAND_TOLERANCE = 10
 
 # Human controls (rebindable key groups).
@@ -63,6 +63,9 @@ GAME_BACKGROUNDS = [game_background, game_background2, game_background3]
 # Menu and splash backgrounds.
 splash_background = pygame.image.load('Hidden/Art/Backgrounds/HuntTheHuman-GameMenuBackgroundv2.png')
 end_game_background = pygame.image.load('Hidden/Art/Backgrounds/HuntTheHuman-EndGameBackground.png')
+end_game_backgrounds = []
+for i in [3,2,4,2]:
+	end_game_backgrounds.append(pygame.image.load(f'Hidden/Art/Backgrounds/HuntTheHuman-EndGameBackground{i}.png'))
 
 # UI tuning.
 BUTTON_WIDTH = 120
@@ -94,14 +97,20 @@ WALL_SPAWN_INTERVAL_VARIATION_MS = 500
 
 WALL_SPAWN_X = SCREEN_WIDTH + 50
 WALL_VERTICAL_OFFSET = 50
-
-_wall_base_image = pygame.image.load('Hidden/Art/Fluff/wall.png')
-wall_image = pygame.transform.scale(
-	_wall_base_image,
-	(_wall_base_image.get_width() * ART_SCALE, _wall_base_image.get_height() * ART_SCALE),
-)
-WALL_WIDTH = wall_image.get_width()
-WALL_HEIGHT = wall_image.get_height()
+WALL_IMAGES_COUNT = 3
+_wall_base_images = [
+	pygame.image.load(f'Hidden/Art/Fluff/wall{index}.png')
+	for index in range(1, WALL_IMAGES_COUNT + 1)
+]
+wall_images = [
+	pygame.transform.scale(
+		image,
+		(image.get_width() * ART_SCALE, image.get_height() * ART_SCALE),
+	)
+	for image in _wall_base_images
+]
+WALL_WIDTH = wall_images[0].get_width()
+WALL_HEIGHT = wall_images[0].get_height()
 
 _human_walk_frames_unscaled = [
 	pygame.image.load(f'Hidden/Art/Human/deserted_islander_running{index}.png')
@@ -117,7 +126,7 @@ human_walk_frames = [
 human_default_image = human_walk_frames[0]
 
 _fox_riding_frames_unscaled = [
-	pygame.image.load(f'Hidden/Art/FoxOnHorse/fox_riding{index}.png')
+	pygame.image.load(f'Hidden/Art/FoxOnHorse/Fox_riding{index}.png')
 	for index in range(1, FOX_RIDING_FRAME_COUNT + 1)
 ]
 

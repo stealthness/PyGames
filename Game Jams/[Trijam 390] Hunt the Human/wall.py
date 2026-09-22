@@ -7,7 +7,7 @@ from config import (
     WALL_SPAWN_X,
     WALL_VERTICAL_OFFSET,
     WALL_SPAWN_INTERVAL_VARIATION_MS,
-    wall_image,
+    wall_images,
 )
 
 
@@ -17,7 +17,7 @@ class Wall:
     The wall moves to the left like all objects in the game to give the illusion of human player movement.
     """
     def __init__(self, x=WALL_SPAWN_X):
-        self.image = wall_image
+        self.image = wall_images[random.randint(0, len(wall_images) - 1)]
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.bottom = SCREEN_HEIGHT - WALL_VERTICAL_OFFSET
